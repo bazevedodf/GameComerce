@@ -1,0 +1,75 @@
+<div class="search-bar position-relative">
+  <!-- Barra de Busca Principal -->
+  <div class="input-group search-input-group">
+    <!-- Ícone de Busca -->
+    <span class="input-group-text bg-dark border-secondary text-light">
+      <i class="bi bi-search"></i>
+    </span>
+    
+    <!-- Campo de Busca -->
+    <input type="text" 
+           class="form-control bg-dark text-light border-secondary"
+           placeholder="Buscar V-Bucks, diamantes, skins, pacotes..."
+           (input)="onBuscar()"
+           (focus)="onFocus()"
+           (blur)="onBlur()"
+           [(ngModel)]="termoBusca"
+           #searchInput>
+    
+    <!-- Botão de Filtro -->
+    <button class="btn btn-outline-secondary border-secondary text-light dropdown-toggle"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            [class.active]="categoriaFiltro">
+      <i class="bi bi-funnel"></i>
+      <span class="d-none d-md-inline ms-1">Filtrar</span>
+    </button>
+    
+    <!-- Dropdown de Filtros -->
+    <ul class="dropdown-menu dropdown-menu-dark border-secondary">
+      <li><h6 class="dropdown-header">Filtrar por Categoria</h6></li>
+      <li>
+        <a class="dropdown-item" 
+           [class.active]="!categoriaFiltro"
+           (click)="aplicarFiltroCategoria('')">
+           Todas as categorias
+        </a>
+      </li>
+      <li><hr class="dropdown-divider"></li>
+      <li *ngFor="let categoria of categorias">
+        <a class="dropdown-item" 
+           [class.active]="categoriaFiltro === categoria.slug"
+           (click)="aplicarFiltroCategoria(categoria.slug)">
+           {{ categoria.name }}
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Sugestões em Tempo Real -->
+  <div class="search-suggestions card border-secondary mt-1" 
+       *ngIf="mostrarSugestoes && sugestoes.length > 0">
+    <div class="card-body p-2">
+      <div *ngFor="let sugestao of sugestoes" 
+           class="suggestion-item p-2 rounded hover-bg-primary"
+           (mousedown)="selecionarSugestao(sugestao)">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-search me-2 text-muted"></i>
+          <div class="flex-grow-1">
+            <div class="fw-semibold text-light">{{ sugestao.nome }}</div>
+            <small class="text-muted">{{ sugestao.categoria }} • {{ sugestao.plataforma }}</small>
+          </div>
+          <div class="text-warning small">
+            R$ {{ sugestao.preco.toFixed(2) }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Busca Avançada (para mobile) -->
+  <div class="search-mobile-modal" *ngIf="mostrarModalMobile">
+    <!-- Implementar modal mobile se necessário -->
+  </div>
+</div>

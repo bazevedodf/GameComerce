@@ -1,0 +1,177 @@
+:host {
+  display: block;
+}
+
+.sticky-top {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1050;
+}
+
+.bg-opacity-95 {
+  --bs-bg-opacity: 0.95;
+}
+
+// Logo com gradiente
+.text-warning {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo-img {
+  height: 60px;
+  max-width: 100px;
+  object-fit: contain;
+  display: block;
+}
+
+// Campo de busca customizado
+.bg-dark.form-control {
+  background-color: #1a1a1a !important;
+  border-color: #6c757d;
+  color: #ffffff;
+  
+  &:focus {
+    background-color: #1a1a1a;
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    color: #ffffff;
+  }
+  
+  &::placeholder {
+    color: #6c757d;
+  }
+}
+
+// Botão do carrinho
+.btn-outline-light {
+  border-color: #6c757d;
+  color: #ffffff;
+  
+  &:hover {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000000;
+  }
+}
+
+/* ===== MENU DE CATEGORIAS ===== */
+.bg-card {
+  background-color: #1a1a1a !important;
+}
+
+// Botões do menu de categorias
+.btn-link {
+  color: #ffffff !important;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: transparent;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    color: #ffc107 !important;
+    transform: translateY(-1px);
+  }
+  
+  // Setinha do dropdown
+  .bi-chevron-down {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+  }
+  
+  &.dropdown-toggle::after {
+    display: none; // Remove seta padrão do Bootstrap
+  }
+}
+
+// Dropdown menus personalizados
+.dropdown-menu {
+  background-color: #1a1a1a !important;
+  border: 1px solid #6c757d;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  min-width: 200px;
+  
+  .dropdown-item {
+    color: #ffffff !important;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #333;
+    transition: all 0.3s ease;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    &:hover {
+      background-color: #ffc107 !important;
+      color: #000000 !important;
+      transform: translateX(5px);
+    }
+  }
+}
+
+// Classe de transição
+.transition-colors {
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+// Classe hover personalizada
+.hover-text-primary:hover {
+  color: #ffc107 !important;
+}
+
+.hover-bg-warning:hover {
+  background-color: #ffc107 !important;
+  color: #000000 !important;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  // Header principal
+  .container > .d-flex {
+    flex-wrap: wrap;
+  }
+  
+  .flex-fill {
+    order: 3;
+    flex-basis: 100%;
+    max-width: 100% !important;
+    margin: 1rem 0 0 0 !important;
+  }
+  
+  // Menu de categorias
+  nav .d-flex {
+    gap: 0.5rem !important;
+    
+    .btn-link {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.8rem;
+    }
+  }
+
+  // Dropdowns em mobile
+  .dropdown-menu {
+    position: static !important;
+    transform: none !important;
+    margin-top: 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  // Menu de categorias em mobile
+  nav .d-flex {
+    justify-content: flex-start !important;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    
+    .btn-link {
+      white-space: nowrap;
+      font-size: 0.75rem;
+    }
+  }
+}

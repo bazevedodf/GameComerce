@@ -1,0 +1,77 @@
+<!-- Header Principal -->
+<header class="sticky-top bg-dark bg-opacity-95 border-bottom border-secondary">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center py-3 gap-4">
+      <!-- Logo -->
+      <div class="d-flex align-items-center gap-2">
+        <a routerLink="/" class="text-decoration-none d-flex align-items-center gap-2">
+          <ng-container *ngIf="siteInfo?.logoUrl; else showName">
+            <img [src]="siteInfo.logoUrl" alt="Logo" height="40" class="logo-img" />
+          </ng-container>
+          <ng-template #showName>
+            <div class="fw-bold fs-3 text-warning font-rajdhani">
+              {{ siteInfo?.nome }}
+            </div>
+          </ng-template>
+        </a>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="flex-fill mx-4" style="max-width: 500px;">
+        <app-search-bar (buscaRealizada)="onBuscaRealizada($event)"></app-search-bar>
+      </div>
+
+      <!-- Cart Button -->
+      <button class="btn btn-outline-light btn-sm d-flex align-items-center gap-2" routerLink="/cart">
+        <i class="bi bi-cart3"></i>
+        Carrinho
+        <span class="badge bg-warning text-dark ms-1">{{ cartItemsCount }}</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Menu de Categorias -->
+<nav class="border-bottom border-secondary bg-card">
+  <div class="container">
+    <div class="d-flex justify-content-center align-items-center gap-1 py-2 flex-wrap">
+      
+      <!-- Categoria com Dropdown -->
+      <div *ngFor="let category of categories" 
+           class="nav-item position-relative"
+           [class.dropdown]="category.hasDropdown">
+        
+        <!-- Botão da Categoria -->
+        <button *ngIf="category.hasDropdown"
+                class="btn btn-link text-decoration-none font-rajdhani fw-semibold text-sm text-light hover-text-primary transition-colors dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                (click)="$event.preventDefault()">
+          {{ category.name }}
+          <i class="bi bi-chevron-down ms-1"></i>
+        </button>
+
+        <!-- Link Simples (sem dropdown) -->
+        <a *ngIf="!category.hasDropdown"
+           class="btn btn-link text-decoration-none font-rajdhani fw-semibold text-sm text-light hover-text-primary transition-colors"
+           (click)="navigateToCategory(category)">
+          {{ category.name }}
+        </a>
+
+        <!-- Dropdown Menu -->
+        <ul *ngIf="category.hasDropdown" 
+            class="dropdown-menu dropdown-menu-dark border-secondary">
+          <li *ngFor="let subcategory of category.subcategories">
+            <a class="dropdown-item text-light font-rajdhani fw-semibold hover-bg-warning"
+               (click)="navigateToSubcategory(subcategory, category)">
+              {{ subcategory.name }}
+            </a>
+          </li>
+        </ul>
+
+      </div>
+      
+    </div>
+  </div>
+</nav>

@@ -1,1 +1,49 @@
-/* You can add global styles to this file, and also import other style files */
+/* ===== IMPORTAR FONTES ===== */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ===== VARIÁVEIS GLOBAIS ===== */
+:root {
+  --primary-color: #0d6efd;
+  --secondary-color: #6c757d;
+  --success-color: #198754;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --dark-color: #000000;
+  --light-color: #f8f9fa;
+  --body-bg: #0f0f0f;
+  --text-color: #ffffff;
+  --border-color: #333333;
+}
+
+/* ===== ESTILOS GLOBAIS ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--body-bg);
+}
+
+/* ===== CLASSES UTILITÁRIAS ===== */
+.bg-card {
+  background-color: #1a1a1a !important;
+}
+
+.border-border {
+  border-color: var(--border-color) !important;
+}
+
+.font-rajdhani {
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
