@@ -1,0 +1,158 @@
+<div class="product-detail-page min-vh-100 bg-dark">
+  <div class="container py-5">
+    
+    <!-- Loading -->
+    <app-loading-spinner [isLoading]="isLoading" message="Carregando produto..."></app-loading-spinner>
+
+    <!-- Produto -->
+    <div class="row" *ngIf="!isLoading && produto">
+      
+      <!-- Imagem -->
+      <div class="col-lg-6 mb-4">
+        <div class="product-image-container">
+          <img [src]="produto.imagem" [alt]="produto.nome" class="product-image rounded mx-auto d-block">
+        </div>
+      </div>
+
+      <!-- Informações -->
+      <div class="col-lg-6">
+        <div class="product-info">
+          
+          <!-- Categoria -->
+          <div class="category-badge mb-1">
+            <span class="badge bg-warning text-dark">{{ produto.categoria }}</span>
+          </div>
+
+          <!-- Nome -->
+          <h1 class="product-title fw-bold mb-1">{{ produto.nome }}</h1>
+
+          <!-- Rating -->
+          <div class="rating-wrapper d-flex align-items-center gap-2 mb-1">
+            <div class="stars d-flex text-warning">
+              <i class="bi bi-star-fill star filled" *ngFor="let star of getStarsArray(produto.avaliacao)"></i>
+              <i class="bi bi-star star" *ngFor="let star of getEmptyStarsArray(produto.avaliacao)"></i>
+            </div>
+            <span class="text-muted">({{ produto.totalAvaliacoes }} avaliações)</span>
+          </div>
+
+          <!-- Preço -->
+          <div class="price-section mb-2 pt-2">
+
+            <div class="d-flex align-items-baseline mt-0">
+                <div *ngIf="produto.precoOriginal > produto.preco" class="original-price text-muted text-decoration-line-through small">
+                    de R$ {{ produto.precoOriginal.toFixed(2) }}
+                </div>
+                <span *ngIf="produto.desconto > 0" class="discount-badge badge bg-danger ms-2">
+                    -{{ produto.desconto }}%
+                </span>
+            </div>
+            <div class="current-price text-white fw-bold fs-2">
+                R$ {{ produto.preco.toFixed(2) }}
+            </div>
+            
+          </div>
+
+          <!-- Descrição -->
+          <!-- <div class="description-section mb-4">
+            <p class="text-muted">{{ produto.descricao }}</p>
+          </div> -->
+
+          <!-- Plataforma e Entrega -->
+          <div class="details-section my-3 pt-4">
+            <div class="row">
+              <div class="col-6">
+                <strong>Entrega:</strong> 
+                <span class="text-success">
+                  <i class="bi bi-lightning-charge ms-2"></i> {{ produto.entrega }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quantidade e Comprar -->
+          <div class="purchase-section mb-4">
+            <div class="quantity-controls d-flex align-items-center gap-3 mb-4">
+                <label class="fw-bold text-white">Quantidade:</label>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-outline-light btn-sm" (click)="alterarQuantidade(-1)">-</button>
+                    <span class="text-white fw-bold px-3">{{ quantidade }}</span>
+                    <button class="btn btn-outline-light btn-sm" (click)="alterarQuantidade(1)">+</button>
+                </div>
+            </div>
+
+            <div class="d-grid gap-3">
+                <button class="btn btn-success btn-lg w-100 fw-bold py-3 mb-3" (click)="comprarAgora()">
+                    <i class="bi bi-bag-check me-2"></i>
+                    Comprar Agora - R$ {{ (produto.preco * quantidade).toFixed(2) }}
+                </button>
+
+                <button class="btn btn-warning btn-lg w-100 fw-bold py-3" (click)="adicionarAoCarrinho()">
+                    <i class="bi bi-cart-plus me-2"></i>
+                    Adicionar ao Carrinho
+                </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Produtos Relacionados -->
+    <div class="related-products mt-2" *ngIf="produtosRelacionados.length > 0">
+        <h3 class="fw-bold mb-4 text-white">Produtos Relacionados</h3>
+        
+        <!-- Carousel -->
+        <div class="position-relative">
+            <!-- Desktop: Grid normal -->
+            <div class="d-none d-md-block">
+            <div class="row g-4">
+                <div class="col-6 col-md-3" *ngFor="let produto of produtosRelacionados">
+                <app-product-card [produto]="produto"></app-product-card>
+                </div>
+            </div>
+            </div>
+
+            <!-- Mobile: Carousel -->
+            <div class="d-block d-md-none">
+            <div class="carousel-container position-relative">
+                <div class="carousel-track" 
+                    [style.transform]="'translateX(' + (-currentSlide * 100) + '%)'">
+                <div class="carousel-slide" *ngFor="let produto of produtosRelacionados; let i = index">
+                    <div class="px-2">
+                    <app-product-card [produto]="produto"></app-product-card>
+                    </div>
+                </div>
+                </div>
+
+                <!-- Botões de navegação -->
+                <button class="carousel-btn carousel-prev btn btn-dark border-0 rounded-circle position-absolute top-50 start-0 translate-middle-y"
+                        (click)="prevSlide()"
+                        [disabled]="currentSlide === 0">
+                <i class="bi bi-chevron-left"></i>
+                </button>
+
+                <button class="carousel-btn carousel-next btn btn-dark border-0 rounded-circle position-absolute top-50 end-0 translate-middle-y"
+                        (click)="nextSlide()"
+                        [disabled]="currentSlide === produtosRelacionados.length - 1">
+                <i class="bi bi-chevron-right"></i>
+                </button>
+
+                <!-- Indicadores -->
+                <div class="carousel-indicators d-flex justify-content-center gap-2 mt-3">
+                <button *ngFor="let produto of produtosRelacionados; let i = index"
+                        class="indicator-btn btn btn-sm p-0 rounded-circle border-0"
+                        [class.active]="i === currentSlide"
+                        (click)="goToSlide(i)">
+                    <span class="d-block rounded-circle" 
+                        [class.bg-warning]="i === currentSlide"
+                        [class.bg-secondary]="i !== currentSlide"
+                        style="width: 8px; height: 8px;"></span>
+                </button>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+
+  </div>
+</div>

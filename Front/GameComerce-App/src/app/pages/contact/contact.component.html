@@ -1,0 +1,211 @@
+<!-- contact.component.html -->
+<div class="contact-page bg-dark text-light py-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-8">
+        
+        <!-- Tela de Agradecimento -->
+        <div *ngIf="submitted" class="text-center">
+          <!-- Cabeçalho -->
+          <div class="text-center mb-4">
+            <i class="bi bi-check-circle-fill text-success display-1 mb-3"></i>
+            <h1 class="fw-bold text-warning mb-0 font-rajdhani">
+              Mensagem Enviada!
+            </h1>
+            <p class="lead text-light mb-0">
+                Obrigado pelo seu contato. Nossa equipe responderá em breve.
+            </p>
+          </div>
+
+          <!-- Card de Confirmação -->
+          <div class="bg-card border border-border rounded-4 p-5 p-md-5 shadow-lg mb-5">
+            <div class="row justify-content-center">
+              <div class="col-md-8">
+                <i class="bi bi-envelope-check text-warning display-4 mb-4"></i>
+                <h3 class="text-warning fw-bold mb-3 font-rajdhani">Recebemos sua mensagem</h3>
+                <p class="text-light mb-4">
+                  Agradecemos pelo seu contato! Nossa equipe de suporte analisará sua mensagem 
+                  e entrará em contato através do email fornecido em até 24 horas.
+                </p>
+                <div class="bg-dark rounded-3 p-4 border-start border-warning border-4 mb-4">
+                  <p class="text-light mb-2">
+                    <i class="bi bi-clock-fill text-warning me-2"></i>
+                    <strong>Horário de Atendimento:</strong> Segunda a Sexta, 9h às 18h
+                  </p>
+                  <p class="text-light mb-0">
+                    <i class="bi bi-whatsapp text-warning me-2"></i>
+                    <strong>WhatsApp:</strong> Atendimento rápido pelo chat
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botões -->
+          <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <button class="btn btn-success btn-lg fw-bold px-4 py-2" (click)="voltarParaFormulario()">
+              <i class="bi bi-envelope me-2"></i>
+              Enviar Nova Mensagem
+            </button>
+            <button class="btn btn-warning btn-lg fw-bold px-4 py-2" routerLink="/">
+              <i class="bi bi-arrow-left me-2"></i>
+              Voltar para Home
+            </button>
+          </div>
+        </div>
+
+        <!-- Formulário de Contato -->
+        <div *ngIf="!submitted">
+          <!-- Cabeçalho -->
+          <div class="text-center mb-3">
+            <h1 class="fw-bold text-warning mb-0 font-rajdhani">
+              Fale Conosco
+            </h1>
+            <p class="lead text-light mb-0">
+              Tem alguma dúvida? Entre em contato com nossa equipe
+            </p>
+          </div>
+
+          <div class="row">
+            <!-- Formulário -->
+            <div class="col-lg-8">
+              <div class="bg-card border border-border rounded-4 p-4 p-md-4 shadow-lg mb-4">
+                <h4 class="text-warning fw-bold mb-4 font-rajdhani border-start border-warning border-4 ps-3">
+                  Envie sua Mensagem
+                </h4>
+
+                <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+                  <!-- Nome -->
+                  <div class="mb-4">
+                    <label for="nome" class="form-label text-light fw-semibold">
+                      <i class="bi bi-person-fill text-warning me-2"></i>
+                      Nome Completo *
+                    </label>
+                    <input type="text" 
+                           class="form-control bg-dark text-light border-border"
+                           id="nome"
+                           formControlName="nome"
+                           [class.is-invalid]="f['nome'].touched && f['nome'].invalid"
+                           placeholder="Seu nome completo">
+                    <div *ngIf="f['nome'].touched && f['nome'].invalid" class="invalid-feedback d-block">
+                      <span *ngIf="f['nome'].errors?.['required']">Nome é obrigatório</span>
+                      <span *ngIf="f['nome'].errors?.['minlength']">Nome deve ter pelo menos 2 caracteres</span>
+                    </div>
+                  </div>
+
+                  <!-- Email -->
+                  <div class="mb-4">
+                    <label for="email" class="form-label text-light fw-semibold">
+                      <i class="bi bi-envelope-fill text-warning me-2"></i>
+                      E-mail *
+                    </label>
+                    <input type="email" 
+                           class="form-control bg-dark text-light border-border"
+                           id="email"
+                           formControlName="email"
+                           [class.is-invalid]="f['email'].touched && f['email'].invalid"
+                           placeholder="seu@email.com">
+                    <div *ngIf="f['email'].touched && f['email'].invalid" class="invalid-feedback d-block">
+                      <span *ngIf="f['email'].errors?.['required']">Email é obrigatório</span>
+                      <span *ngIf="f['email'].errors?.['email']">Digite um email válido</span>
+                    </div>
+                  </div>
+
+                  <!-- Mensagem -->
+                  <div class="mb-4">
+                    <label for="mensagem" class="form-label text-light fw-semibold">
+                      <i class="bi bi-chat-left-text-fill text-warning me-2"></i>
+                      Mensagem *
+                    </label>
+                    <textarea class="form-control bg-dark text-light border-border"
+                              id="mensagem"
+                              formControlName="mensagem"
+                              [class.is-invalid]="f['mensagem'].touched && f['mensagem'].invalid"
+                              rows="5"
+                              placeholder="Descreva sua dúvida, sugestão ou problema..."></textarea>
+                    <div *ngIf="f['mensagem'].touched && f['mensagem'].invalid" class="invalid-feedback d-block">
+                      <span *ngIf="f['mensagem'].errors?.['required']">Mensagem é obrigatória</span>
+                      <span *ngIf="f['mensagem'].errors?.['minlength']">Mensagem deve ter pelo menos 10 caracteres</span>
+                    </div>
+                  </div>
+
+                  <!-- Botão Enviar -->
+                  <div class="d-grid">
+                    <button type="submit" 
+                            class="btn btn-success btn-lg fw-bold py-3"
+                            [disabled]="isLoading">
+                      <span *ngIf="!isLoading">
+                        <i class="bi bi-send-fill me-2"></i>
+                        Enviar Mensagem
+                      </span>
+                      <span *ngIf="isLoading">
+                        <i class="bi bi-hourglass-split me-2"></i>
+                        Enviando...
+                      </span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Informações de Contato -->
+            <div class="col-lg-4">
+              <div class="bg-card border border-border rounded-4 p-4 shadow-lg">
+                <h4 class="text-warning fw-bold mb-4 font-rajdhani border-start border-warning border-4 ps-3">
+                  Informações
+                </h4>
+
+                <div class="mb-4">
+                  <h6 class="text-light fw-semibold mb-3">
+                    <i class="bi bi-clock-fill text-warning me-2"></i>
+                    Horário de Atendimento
+                  </h6>
+                  <p class="text-light mb-0 small">
+                    Segunda a Sexta: 9h às 18h<br>
+                    Sábado: 9h às 13h<br>
+                    <span class="text-warning">Domingo: Fechado</span>
+                  </p>
+                </div>
+
+                <div class="mb-4">
+                  <h6 class="text-light fw-semibold mb-0">
+                    <i class="bi bi-envelope-fill text-warning me-2"></i>
+                    E-mail
+                  </h6>
+                  <p class="text-light mb-0 small" *ngIf="siteInfo?.email">
+                    {{ siteInfo?.email }}
+                  </p>
+                </div>
+
+                <div class="mb-4" *ngIf="siteInfo?.whatsapp">
+                  <h6 class="text-light fw-semibold mb-0">
+                    <i class="bi bi-whatsapp text-warning me-2"></i>
+                    WhatsApp
+                  </h6>
+                  <p class="text-light mb-0 small" *ngIf="siteInfo?.whatsapp">
+                    {{ siteInfo?.whatsapp }}
+                  </p>
+                </div>
+
+                <div class="mt-4 pt-3 border-top border-border">
+                  <p class="text-light-50 small mb-0">
+                    Respondemos todos os contatos em até 24 horas durante dias úteis.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botão Voltar -->
+          <div class="text-center mt-4">
+            <button class="btn btn-warning btn-lg fw-bold px-4 py-2" routerLink="/">
+              <i class="bi bi-arrow-left me-2"></i>
+              Voltar para Home
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -25,7 +25,7 @@ export class SiteInfoService {
       email: 'contato@gamecomerce.com.br',
       instagram: 'https://instagram.com/gamecomerce',
       facebook: 'https://facebook.com/gamecomerce',
-      whatsapp: 'https://wa.me/5511999999999',
+      whatsapp: '(11) 99999-9999',
     };
 
     this.cachedInfo = mockInfo;

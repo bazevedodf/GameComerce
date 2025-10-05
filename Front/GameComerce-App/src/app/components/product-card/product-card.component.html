@@ -1,80 +1,91 @@
-<div class="card product-card h-100 border-0 shadow-sm">
-  <!-- Badge de Desconto -->
-  <div class="position-absolute top-0 end-0 m-2">
-    <span *ngIf="produto.desconto > 0" class="badge bg-danger fs-6">
-      -{{ produto.desconto }}%
-    </span>
-  </div>
-
-  <!-- Imagem do Produto -->
-  <div class="position-relative overflow-hidden">
+<a class="product-card card h-100 text-decoration-none position-relative overflow-hidden"
+   [routerLink]="['/produto', produto.id]"
+   (mouseenter)="onMouseEnter($event)"
+   (mouseleave)="onMouseLeave($event)"
+   (mousemove)="onMouseMove($event)"
+   style="transform: perspective(1000px) rotateX(0deg) rotateY(0deg); transition: transform 0.5s;">
+  
+  <!-- Imagem do Produto com Reflection Effect -->
+  <div class="product-card__image position-relative overflow-hidden">
     <img [src]="produto.imagem" 
          [alt]="produto.nome"
-         class="card-img-top product-image">
+         class="card-img-top"
+         loading="lazy">
+    <div class="reflection position-absolute top-0 start-0 w-100 h-100" 
+         [style.transform]="reflectionTransform"></div>
     
-    <!-- Overlay de Ações -->
-    <div class="product-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-      <button class="btn btn-warning btn-sm fw-bold" (click)="compraRapida()">
-        <i class="bi bi-lightning-charge me-1"></i>
-        Comprar Agora
+    <!-- Botões no Overlay (DENTRO da imagem) -->
+    <div class="add-to-cart-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center"
+        [class.d-none]="!showAddToCart"
+        [class.d-flex]="showAddToCart">
+      
+      <!-- Botão Comprar Agora -->
+      <button class="btn btn-success fw-bold px-4 py-2 mb-2 buy-now-btn"
+              (click)="comprarAgora($event)"
+              title="Comprar Agora">
+        🚀 Comprar Agora
+      </button>
+
+      <!-- Botão Adicionar ao Carrinho -->
+      <button class="btn btn-warning fw-bold px-4 py-2 add-to-cart-btn"
+              (click)="adicionarAoCarrinho($event)"
+              title="Adicionar ao Carrinho">
+        <i class="bi bi-cart-plus me-2"></i>
+        Adicionar
       </button>
     </div>
+         
   </div>
 
-  <!-- Corpo do Card -->
-  <div class="card-body d-flex flex-column">
-    <!-- Categoria -->
-    <div class="mb-2">
-      <span class="badge bg-dark text-light fs-7">{{ produto.categoria }}</span>
-      <span class="badge bg-secondary text-light fs-7 ms-1">{{ produto.plataforma }}</span>
-    </div>
-
-    <!-- Nome do Produto -->
-    <h5 class="card-title fs-6 fw-bold text-dark mb-2 line-clamp-2">
-      {{ produto.nome }}
-    </h5>
-
-    <!-- Descrição -->
-    <p class="card-text text-muted small mb-3 flex-grow-1 line-clamp-2">
-      {{ produto.descricao }}
-    </p>
-
-    <!-- Entrega -->
-    <div class="d-flex align-items-center mb-3">
-      <i class="bi bi-lightning text-success me-1"></i>
-      <small class="text-success fw-bold">{{ produto.entrega }}</small>
+  <!-- Informações do Produto -->
+  <div class="product-card__info card-body d-flex flex-column p-3">
+    
+    <!-- Título com Ícone e Verificação -->
+    <div class="product-card__title-wrapper mb-1">
+      <span class="product-card__title d-flex align-items-center gap-2 text-light fw-bold">
+        <img *ngIf="produto.categoria.icon" 
+          [src]="produto.categoria.icon" 
+          [alt]="produto.categoria.name" 
+          class="platform-icon">
+        {{ formatProductName(produto.nome) }}
+        <i class="bi bi-patch-check-fill text-primary fs-6 verify-icon"></i>
+      </span>
     </div>
 
     <!-- Rating -->
-    <div class="d-flex align-items-center mb-3">
-      <div class="text-warning me-2">
-        <i class="bi bi-star-fill" *ngFor="let star of getStarsArray(produto.avaliacao)"></i>
-        <i class="bi bi-star" *ngFor="let star of getEmptyStarsArray(produto.avaliacao)"></i>
+    <div class="rating-wrapper small d-flex align-items-center gap-2 mb-1">
+      <div class="stars d-flex text-warning">
+        <i class="bi bi-star-fill star filled" *ngFor="let star of getStarsArray(produto.avaliacao)"></i>
+        <i class="bi bi-star star" *ngFor="let star of getEmptyStarsArray(produto.avaliacao)"></i>
       </div>
-      <small class="text-muted">({{ produto.totalAvaliacoes }})</small>
+      <span class="reviews text-secondary small">{{ produto.totalAvaliacoes }} avaliações</span>
     </div>
 
     <!-- Preço -->
-    <div class="mt-auto">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <div>
-          <span *ngIf="produto.precoOriginal > produto.preco" 
-                class="text-muted text-decoration-line-through me-2">
-            R$ {{ produto.precoOriginal.toFixed(2) }}
-          </span>
-          <span class="fs-5 fw-bold text-dark">
-            R$ {{ produto.preco.toFixed(2) }}
-          </span>
-        </div>
+    <div class="product-card__price-container mt-auto d-flex align-items-baseline gap-2">
+      <div class="product-card__current-price text-light fw-bold">
+        R$ {{ produto.preco.toFixed(2) }}
       </div>
-
-      <!-- Botão de Ação -->
-      <button class="btn btn-primary w-100 fw-bold py-2"
-              [disabled]="!produto.ativo"
-              (click)="adicionarAoCarrinho()">
-        <i class="bi bi-cart-plus me-2"></i>
-        {{ produto.ativo ? 'Adicionar ao Carrinho' : 'Fora de Estoque' }}
-      </button>
+      <div *ngIf="produto.precoOriginal > produto.preco" 
+           class="text-danger text-decoration-line-through small">
+        R$ {{ produto.precoOriginal.toFixed(2) }}
+      </div>
     </div>
+
+    <!-- Badge de Desconto -->
+    <div *ngIf="produto.desconto > 0" class="position-absolute top-0 end-0 m-2">
+      <span class="badge bg-danger rounded-pill">
+        -{{ produto.desconto }}%
+      </span>
+    </div>
+
+    <!-- Badge de Entrega Instantânea -->
+    <!-- <div class="delivery-badge bottom-0 start-0 m-2">
+      <span class="badge bg-success small">
+        <i class="bi bi-lightning-charge me-1"></i>
+        Entrega Imediata
+      </span>
+    </div> -->
+
   </div>
-</div>
+</a>

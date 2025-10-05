@@ -1,9 +1,10 @@
 <div class="d-flex flex-column min-vh-100">
-  <app-navbar [siteInfo]="siteInfo"></app-navbar>
+  <app-navbar></app-navbar>
   
   <main class="flex-grow-1">
     <router-outlet></router-outlet>
   </main>
   
-  <app-footer [siteInfo]="siteInfo"></app-footer>
+  <app-footer></app-footer>
+  <app-cart-sidebar></app-cart-sidebar>
 </div>

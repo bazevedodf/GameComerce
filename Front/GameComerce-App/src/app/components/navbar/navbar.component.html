@@ -1,12 +1,20 @@
 <!-- Header Principal -->
 <header class="sticky-top bg-dark bg-opacity-95 border-bottom border-secondary">
   <div class="container">
-    <div class="d-flex justify-content-between align-items-center py-3 gap-4">
+    <div class="d-flex justify-content-between align-items-center py-3">
+      
       <!-- Logo -->
-      <div class="d-flex align-items-center gap-2">
+      <div class="d-flex align-items-center gap-3">
+        <!-- Hamburger Menu Button (Mobile) -->
+        <button class="btn btn-outline-light d-lg-none" 
+                (click)="toggleMobileMenu()">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <!-- Logo -->
         <a routerLink="/" class="text-decoration-none d-flex align-items-center gap-2">
           <ng-container *ngIf="siteInfo?.logoUrl; else showName">
-            <img [src]="siteInfo.logoUrl" alt="Logo" height="40" class="logo-img" />
+            <img [src]="siteInfo?.logoUrl" alt="Logo" height="40" class="logo-img" />
           </ng-container>
           <ng-template #showName>
             <div class="fw-bold fs-3 text-warning font-rajdhani">
@@ -17,22 +25,23 @@
       </div>
 
       <!-- Search Bar -->
-      <div class="flex-fill mx-4" style="max-width: 500px;">
+      <div class="flex-fill mx-4 d-none d-lg-block" style="max-width: 500px;">
         <app-search-bar (buscaRealizada)="onBuscaRealizada($event)"></app-search-bar>
       </div>
 
       <!-- Cart Button -->
-      <button class="btn btn-outline-light btn-sm d-flex align-items-center gap-2" routerLink="/cart">
-        <i class="bi bi-cart3"></i>
-        Carrinho
-        <span class="badge bg-warning text-dark ms-1">{{ cartItemsCount }}</span>
+      <button class="btn btn-outline-light btn-sm d-flex align-items-center gap-2" (click)="abrirCarrinho()">
+        <i class="bi bi-cart3"></i> Carrinho
+        <span class="badge bg-warning text-dark ms-1" *ngIf="cartItemsCount > 0">
+          {{ cartItemsCount }}
+        </span>
       </button>
     </div>
   </div>
 </header>
 
 <!-- Menu de Categorias -->
-<nav class="border-bottom border-secondary bg-card">
+<nav class="border-bottom border-secondary bg-card d-none d-lg-block">
   <div class="container">
     <div class="d-flex justify-content-center align-items-center gap-1 py-2 flex-wrap">
       
@@ -41,21 +50,36 @@
            class="nav-item position-relative"
            [class.dropdown]="category.hasDropdown">
         
-        <!-- Botão da Categoria -->
-        <button *ngIf="category.hasDropdown"
-                class="btn btn-link text-decoration-none font-rajdhani fw-semibold text-sm text-light hover-text-primary transition-colors dropdown-toggle"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-                (click)="$event.preventDefault()">
-          {{ category.name }}
-          <i class="bi bi-chevron-down ms-1"></i>
-        </button>
+        <!-- Categoria com Dropdown (HOVER) -->
+        <div *ngIf="category.hasDropdown" 
+            class="nav-item position-relative dropdown-hover">
+          
+          <!-- Link da Categoria (clique navega) -->
+          <a class="btn btn-link text-decoration-none font-rajdhani fw-semibold text-sm text-light hover-text-primary transition-colors"
+            [routerLink]="['/produtos']" 
+            [queryParams]="{ categoria: category.slug }">
+            {{ category.name }}
+            <i class="bi bi-chevron-down ms-1"></i>
+          </a>
 
-        <!-- Link Simples (sem dropdown) -->
+          <!-- Dropdown Menu (aparece no hover) -->
+          <ul class="dropdown-menu-hover">
+            <li *ngFor="let subcategory of category.subcategories">
+              <a class="mobile-subcategory-item d-block p-2 ps-4 text-decoration-none text-light font-rajdhani"
+                [routerLink]="['/produtos']" 
+                [queryParams]="{ categoria: category.slug, subcategoria: subcategory.slug }">
+                {{ subcategory.name }}
+              </a>
+            </li>
+          </ul>
+
+        </div>
+
+        <!-- Categoria Simples (sem dropdown) -->
         <a *ngIf="!category.hasDropdown"
-           class="btn btn-link text-decoration-none font-rajdhani fw-semibold text-sm text-light hover-text-primary transition-colors"
-           (click)="navigateToCategory(category)">
+          class="btn btn-link text-decoration-none font-rajdhani fw-semibold text-sm text-light hover-text-primary transition-colors"
+          [routerLink]="['/produtos']" 
+          [queryParams]="{ categoria: category.slug }">
           {{ category.name }}
         </a>
 
@@ -64,7 +88,8 @@
             class="dropdown-menu dropdown-menu-dark border-secondary">
           <li *ngFor="let subcategory of category.subcategories">
             <a class="dropdown-item text-light font-rajdhani fw-semibold hover-bg-warning"
-               (click)="navigateToSubcategory(subcategory, category)">
+              [routerLink]="['/produtos']" 
+              [queryParams]="{ categoria: category.slug }">
               {{ subcategory.name }}
             </a>
           </li>
@@ -75,3 +100,43 @@
     </div>
   </div>
 </nav>
+
+<!-- Mobile Menu Overlay -->
+<div class="mobile-menu-overlay" 
+     [class.show]="isMobileMenuOpen"
+     (click)="closeMobileMenu()">
+</div>
+
+<!-- Mobile Menu Sidebar -->
+<div class="mobile-menu-sidebar" [class.open]="isMobileMenuOpen">
+  
+  <!-- Mobile Menu Header -->
+  <div class="mobile-menu-header bg-dark p-3 border-bottom border-secondary">
+    <div class="d-flex align-items-center justify-content-between">
+      <h5 class="mb-0 text-light font-rajdhani">Menu</h5>
+      <button class="btn btn-outline-light btn-sm" (click)="closeMobileMenu()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Content -->
+  <div class="mobile-menu-content p-3">
+    
+    <!-- Categorias no Mobile -->
+    <div class="mobile-categories">
+      <div *ngFor="let category of categories" class="mobile-category-item">
+        
+        <!-- TODAS as categorias são links simples -->
+        <a class="mobile-category-btn w-100 text-start d-block p-2 text-decoration-none text-light font-rajdhani fw-semibold"
+          [routerLink]="['/produtos']" 
+          [queryParams]="{ categoria: category.slug }"
+          (click)="closeMobileMenu()">
+          {{ category.name }}
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</div>

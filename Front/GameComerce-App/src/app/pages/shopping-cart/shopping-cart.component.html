@@ -1,0 +1,361 @@
+<app-loading-spinner 
+    [isLoading]="isLoading"
+    [message]="loadingMessage"
+    [subMessage]="loadingSubMessage">
+</app-loading-spinner>
+<app-toast-message 
+    #toastMessage
+    [type]="toastType"
+    [message]="toastMessageText"
+    [seconds]="5">
+</app-toast-message>
+<div class="shopping-cart-page min-vh-100 mt-5">
+  <div class="container py-4">
+    
+    <!-- Cabeçalho -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h1 class="fw-bold mb-2 text-white">Carrinho de compras</h1>
+        <p class="text-subtitle mb-0">Nesta página, você encontra os produtos adicionados ao seu carrinho.</p>
+      </div>
+    </div>
+
+    <!-- Layout 3 Colunas -->
+    <div class="row g-4">
+      
+      <!-- Coluna Esquerda - Informações de pagamento -->
+      <div class="col-md-3">
+        <div class="card border-custom payment-card h-100">
+          <div class="card-body">
+            <h5 class="card-title fw-bold mb-3 text-white">Informações de pagamento</h5>
+            
+            <!-- Seção PIX -->
+            <div class="pix-section border-success-custom rounded p-3 mb-4">
+              <div class="mb-0">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="pix-icon" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M242.4 292.5C247.8 287.1 257.1 287.1 262.5 292.5L339.5 369.5C353.7 383.7 372.6 391.5 392.6 391.5H407.7L310.6 488.6C280.3 518.1 231.1 518.1 200.8 488.6L103.3 391.2H112.6C132.6 391.2 151.5 383.4 165.7 369.2L242.4 292.5zM262.5 218.9C256.1 224.4 247.9 224.5 242.4 218.9L165.7 142.2C151.5 127.1 132.6 120.2 112.6 120.2H103.3L200.7 22.76C231.1-7.586 280.3-7.586 310.6 22.76L407.8 119.9H392.6C372.6 119.9 353.7 127.7 339.5 141.9L262.5 218.9zM112.6 142.7C126.4 142.7 139.1 148.3 149.7 158.1L226.4 234.8C233.6 241.1 243 245.6 252.5 245.6C261.9 245.6 271.3 241.1 278.5 234.8L355.5 157.8C365.3 148.1 378.8 142.5 392.6 142.5H430.3L488.6 200.8C518.9 231.1 518.9 280.3 488.6 310.6L430.3 368.9H392.6C378.8 368.9 365.3 363.3 355.5 353.5L278.5 276.5C264.6 262.6 240.3 262.6 226.4 276.6L149.7 353.2C139.1 363 126.4 368.6 112.6 368.6H80.78L22.76 310.6C-7.586 280.3-7.586 231.1 22.76 200.8L80.78 142.7H112.6z"></path></svg>
+                <label class="form-check-label fw-bold text-white ms-2" for="pix">
+                  PIX
+                </label>
+              </div>
+            </div>
+
+            <!-- Formulário Email COM REACTIVE FORMS -->
+            <form [formGroup]="checkoutForm">
+              
+              <!-- Email -->
+              <div class="mb-3">
+                <label for="email" class="form-label fw-bold text-white small">
+                  E-Mail <span class="text-success">*</span>
+                </label>
+                <input type="email" 
+                      class="form-control custom-input small"
+                      [class.is-invalid]="checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched"
+                      id="email"
+                      formControlName="email"
+                      placeholder="seu@email.com">
+                
+                <!-- Mensagens de erro Email -->
+                <div *ngIf="checkoutForm.get('email')?.touched && checkoutForm.get('email')?.invalid" class="invalid-feedback d-block">
+                  <div *ngIf="checkoutForm.get('email')?.errors?.['required']" class="small text-danger">
+                    Email é obrigatório
+                  </div>
+                  <div *ngIf="checkoutForm.get('email')?.errors?.['email']" class="small text-danger">
+                    Digite um email válido
+                  </div>
+                </div>
+              </div>
+
+              <!-- TELEFONE -->
+              <div class="mb-4">
+                <label for="telefone" class="form-label fw-bold text-white small">
+                  Telefone/WhatsApp <span class="text-success">*</span>
+                </label>
+                <input type="tel" 
+                      class="form-control custom-input small"
+                      [class.is-invalid]="checkoutForm.get('telefone')?.invalid && checkoutForm.get('telefone')?.touched"
+                      id="telefone"
+                      formControlName="telefone"
+                      placeholder="(11) 99999-9999"
+                      (input)="formatarTelefone($event)">
+                
+                <!-- MENSAGENS DE ERRO DO TELEFONE -->
+                <div *ngIf="checkoutForm.get('telefone')?.touched && checkoutForm.get('telefone')?.invalid" class="invalid-feedback d-block">
+                  <div *ngIf="checkoutForm.get('telefone')?.errors?.['required']" class="small text-danger">
+                    Telefone é obrigatório
+                  </div>
+                  <div *ngIf="checkoutForm.get('telefone')?.errors?.['pattern']" class="small text-danger">
+                    Digite um telefone válido: (11) 99999-9999
+                  </div>
+                </div>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna Central - Produtos no carrinho -->
+      <div class="col-md-6">
+        <div class="card h-100 border-custom products-card">
+          <div class="card-body">
+            <h5 class="card-title fw-bold mb-3 text-white">Produtos no carrinho</h5>
+            
+            <!-- Carrinho Vazio -->
+            <div *ngIf="cartItems.length === 0" class="text-center py-4">
+              <i class="bi bi-cart-x display-4 text-subtitle mb-3 d-block"></i>
+              <p class="text-subtitle mb-4">Seu carrinho está vazio</p>
+              <button class="btn btn-success-custom" (click)="continuarComprando()">
+                Continuar Comprando
+              </button>
+            </div>
+
+            <!-- Lista de Produtos -->
+            <div *ngIf="cartItems.length > 0">
+              <div *ngFor="let item of cartItems" class="cart-item d-flex align-items-center justify-content-between py-3 border-bottom border-custom">
+                
+                <!-- Imagem e Nome -->
+                <div class="d-flex align-items-center gap-3 flex-grow-1">
+                  <img [src]="item.produto.imagem" 
+                       [alt]="item.produto.nome"
+                       class="rounded product-image">
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold fs-7 mb-1 text-white">{{ item.produto.nome }}</span>
+                    <a href="#" class="text-success text-decoration-none small exclude-link" 
+                       (click)="removerItem(item.produto.id); $event.preventDefault()">
+                      <i class="bi bi-trash me-2"></i>Excluir
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Controles e Preço -->
+                <div class="d-flex align-items-center gap-3">
+                  <!-- Quantidade -->
+                  <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-success btn-quantity"
+                            (click)="alterarQuantidade(item.produto.id, item.quantidade - 1)"
+                            [disabled]="item.quantidade <= 1">
+                      <i class="bi bi-dash"></i>
+                    </button>
+                    <span class="fw-bold px-2 text-white quantity-text">{{ item.quantidade }}</span>
+                    <button class="btn btn-success btn-quantity"
+                            (click)="alterarQuantidade(item.produto.id, item.quantidade + 1)">
+                      <i class="bi bi-plus"></i>
+                    </button>
+                  </div>
+
+                  <!-- Preço -->
+                  <span class="fw-bold text-white price-text">
+                    R$ {{ (item.produto.preco * item.quantidade).toFixed(2) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna Direita - Resumo da compra -->
+      <div class="col-md-3">
+        <div class="card h-100 border-custom summary-card">
+          <div class="card-body">
+            <h5 class="card-title fw-bold mb-3 text-white">Resumo da compra</h5>
+            
+            <!-- Subtotal -->
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-white">Subtotal <span class="text-subtitle">({{ totalItens }} itens)</span></span>
+              <span class="text-white">R$ {{ subtotal.toFixed(2) }}</span>
+            </div>
+
+            <!-- Desconto do Cupom (se aplicado) -->
+            <div *ngIf="descontoAplicado && valorDesconto > 0" class="d-flex justify-content-between mb-2">
+              <span class="text-success small">
+                <i class="bi bi-tag me-1"></i>Desconto
+                <small *ngIf="cupomAplicado?.tipoDesconto === 'percentual'" class="text-subtitle">
+                  ({{ getPercentualDesconto() }}%)
+                </small>
+              </span>
+              <span class="text-success small">- R$ {{ valorDesconto.toFixed(2) }}</span>
+            </div>
+
+            <!-- Frete -->
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-white">Frete</span>
+              <span class="text-white" [class.text-success]="frete === 0">
+                {{ frete === 0 ? 'Grátis' : 'R$ ' + frete.toFixed(2) }}
+              </span>
+            </div>
+
+            <!-- Total -->
+            <div class="d-flex justify-content-between align-items-center border-top pt-3 mb-4">
+              <span class="fw-bold text-white">Total</span>
+              <span class="fw-bold fs-5 text-white">R$ {{ total.toFixed(2) }}</span>
+            </div>
+
+            <!-- Cupom COM VALIDAÇÃO -->
+            <div class="coupon-section mb-4">
+              <label class="form-label fw-bold text-white small">Cupom de desconto</label>
+              
+              <!-- Campo do cupom -->
+              <input type="text" 
+                class="form-control custom-input small mb-2"
+                [class.is-invalid]="cupomError"
+                [(ngModel)]="cupom"
+                placeholder="Digite seu cupom"
+                [disabled]="isValidandoCupom || descontoAplicado">
+              
+              <!-- Botão Aplicar DESCONTO -->
+              <button *ngIf="!descontoAplicado" 
+                      class="btn btn-warning w-100 btn-sm py-2 mb-2" 
+                      (click)="aplicarCupom()"
+                      [disabled]="isValidandoCupom || !cupom">
+                <span *ngIf="!isValidandoCupom">
+                  <i class="bi bi-tag me-1"></i>
+                  Aplicar Desconto
+                </span>
+                <span *ngIf="isValidandoCupom">
+                  <i class="bi bi-arrow-repeat spinner-border spinner-border-sm me-1"></i>
+                  Validando...
+                </span>
+              </button>
+
+              <!-- Botão Limpar Cupom (aparece quando desconto está aplicado) -->
+              <button *ngIf="descontoAplicado" 
+                      class="btn btn-warning w-100 btn-sm py-2 mb-2" 
+                      (click)="limparCupom()">
+                <i class="bi bi-x-circle me-1"></i>
+                Limpar Cupom
+              </button>
+              
+              <!-- Mensagem de erro do cupom -->
+              <div *ngIf="cupomError" class="invalid-feedback d-block">
+                <small class="text-danger">{{ cupomError }}</small>
+              </div>
+              
+              <!-- Cupom aplicado com sucesso -->
+              <div *ngIf="descontoAplicado && valorDesconto > 0" class="valid-feedback d-block">
+                <small class="text-success">
+                  <i class="bi bi-check-circle me-1"></i>
+                  Desconto de R$ {{ valorDesconto.toFixed(2) }} aplicado!
+                </small>
+              </div>
+            </div>
+
+            <!-- Botão Finalizar -->
+            <button class="btn btn-success-custom w-100 fw-bold py-2" (click)="finalizarCompra()">
+              <i class="bi bi-credit-card me-2"></i>
+              Continuar com PIX
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Modal PIX ATUALIZADO -->
+  <div class="modal fade" id="pixModal" tabindex="-1" aria-labelledby="pixModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content custom-modal">
+        
+        <!-- Cabeçalho -->
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold text-white" id="pixModalLabel">
+            <span *ngIf="isPixPendente()">Pagamento via PIX</span>
+            <span *ngIf="isPixPago()" class="text-success">Pagamento Confirmado! ✅</span>
+            <span *ngIf="isPixExpirado()" class="text-danger">Pagamento Expirado ❌</span>
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- Conteúdo - PIX PENDENTE -->
+        <div *ngIf="isPixPendente()" class="modal-body text-center">
+          
+          <!-- Progress Bar e Temporizador -->
+          <div class="mb-4">
+            <div class="progress-bar-container mb-2">
+              <div class="progress" style="height: 8px; background: #374151;">
+                <div class="progress-bar bg-success" 
+                    role="progressbar" 
+                    [style.width.%]="progresso"
+                    [attr.aria-valuenow]="progresso" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100">
+                </div>
+              </div>
+              <div class="text-center mt-2">
+                <small class="text-white fw-bold">{{ formatarTempoRestante() }}</small>
+              </div>
+            </div>
+          </div>
+          
+          <!-- QR Code Dinâmico -->
+          <div class="mb-4">
+            <img [src]="pedidoResponse?.qrCodeImage" 
+                alt="QR Code PIX" 
+                class="img-fluid rounded"
+                style="max-width: 250px;">
+          </div>
+
+          <!-- Código PIX Dinâmico -->
+          <div class="pix-code bg-dark rounded p-3 mb-3">
+            <code class="text-white text-wrap fs-6 user-select-all">
+              {{ pedidoResponse?.pixCode }}
+            </code>
+          </div>
+
+          <!-- Instruções -->
+          <p class="text-subtitle small mb-3">
+            Escaneie o QR Code ou copie o código PIX para realizar o pagamento
+          </p>
+          <button type="button" 
+                  class="btn btn-success-custom mb-3"
+                  (click)="copiarCodigoPix()">
+            <i class="bi bi-clipboard me-2"></i>Copiar Código
+          </button>
+        </div>
+
+        <!-- Conteúdo - PIX PAGO -->
+        <div *ngIf="isPixPago()" class="modal-body text-center">
+          <div class="success-icon mb-4">
+            <i class="bi bi-check-circle-fill text-success display-1"></i>
+          </div>
+          <h4 class="text-success fw-bold mb-3">Pagamento Confirmado!</h4>
+          <p class="text-white mb-3">
+            Obrigado pela sua compra! Seus produtos serão enviados para:
+          </p>
+          <p class="fw-bold text-white mb-4">{{ email }}</p>
+          <p class="text-subtitle small">
+            Você receberá um email de confirmação em breve.
+          </p>
+        </div>
+
+        <!-- Conteúdo - PIX EXPIRADO -->
+        <div *ngIf="isPixExpirado()" class="modal-body text-center">
+          <div class="error-icon mb-4">
+            <i class="bi bi-x-circle-fill text-danger display-1"></i>
+          </div>
+          <h4 class="text-danger fw-bold mb-3">Pagamento Não Identificado</h4>
+          <p class="text-white mb-4">
+            O PIX não foi pago dentro do prazo e expirou.
+          </p>
+          <p class="text-subtitle small">
+            Se você realizou o pagamento, entre em contato com nosso suporte.
+          </p>
+        </div>
+
+        <!-- Rodapé -->
+        <div class="modal-footer border-secondary">
+          <button type="button" 
+                  class="btn btn-outline-light" 
+                  data-bs-dismiss="modal">
+            {{ isPixPago() || isPixExpirado() ? 'Voltar à Loja' : 'Fechar' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

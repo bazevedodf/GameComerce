@@ -1,0 +1,51 @@
+// contact.component.scss
+.contact-page {
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+}
+
+// Animação suave de entrada
+:host {
+  display: block;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Estilos do formulário
+.form-control {
+  border: 1px solid #444;
+  transition: all 0.3s ease;
+  
+  &:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    background-color: #1a1a1a;
+    color: #fff;
+  }
+  
+  &::placeholder {
+    color: #6c757d;
+  }
+}
+
+// Loading states
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .contact-page {
+    padding: 2rem 0;
+  }
+}

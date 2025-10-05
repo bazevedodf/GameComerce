@@ -518,3 +518,41 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# limpeza do angular e temporarios
+
+# Angular cache
+.angular/
+.cache/
+node_modules/
+dist/
+
+# Angular build artifacts
+*.ngsummary.json
+*.ngfactory.ts
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+

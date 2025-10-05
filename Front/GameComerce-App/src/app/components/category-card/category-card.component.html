@@ -17,9 +17,14 @@
       {{ categoria.name }}
     </h5>
 
+    <!-- Descrição da Categoria -->
+    <p class="card-text small opacity-75 mb-2 line-clamp-2">
+      {{ categoria.descricao || 'Explore os melhores produtos' }}
+    </p>
+
     <!-- Ícone/Botão -->
     <div class="d-flex align-items-center justify-content-between">
-      <span class="small opacity-75">
+      <span class="badge bg-warning text-dark small opacity-75">
         Explorar
       </span>
       

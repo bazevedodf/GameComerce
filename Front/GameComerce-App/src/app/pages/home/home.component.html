@@ -1,30 +1,33 @@
 <!-- Hero Section -->
 <section class="hero-section position-relative overflow-hidden">
+  <app-loading-spinner 
+    [isLoading]="isLoading"
+    [message]="loadingMessage"
+    [subMessage]="loadingSubMessage"
+    [showProgress]="showProgressBar"
+    [progress]="loadingProgress">
+  </app-loading-spinner>
   <div class="container">
-    <div class="row align-items-center min-vh-80 py-5">
-      <div class="col-lg-6">
+    <div class="row align-items-center min-vh-80 py-4">
+      <div class="col-12 col-lg-6">
         <div class="hero-content text-center text-lg-start">
           <h1 class="display-4 fw-bold text-white mb-4 font-rajdhani">
-            Os Melhores <span class="text-warning">Pacotes</span> de Jogos
+            <span class="text-warning">Recarga</span> para os melhores Jogos
           </h1>
-          <p class="lead text-light mb-5 fs-5">
-            Economize até <span class="text-warning fw-bold">90%</span> em V-Bucks, Diamantes, 
-            Points e muito mais. Entrega instantânea e preços imbatíveis!
+          <p class="lead text-light mb-4 fs-4">
+            Economize até <span class="text-warning fw-bold">90%</span> em Robux, Diamantes, 
+            V-Bucks e muito mais. Entrega Imediata e preços imbatíveis!
           </p>
           
           <div class="hero-actions d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
-            <button class="btn btn-warning btn-lg fw-bold px-4 py-3">
+            <button class="btn btn-warning btn-lg fw-bold px-4 py-3" routerLink="/produtos">
               <i class="bi bi-lightning-charge me-2"></i>
               Explorar Produtos
-            </button>
-            <button class="btn btn-outline-light btn-lg px-4 py-3">
-              <i class="bi bi-play-circle me-2"></i>
-              Como Funciona
             </button>
           </div>
 
           <!-- Stats -->
-          <div class="hero-stats row mt-5 pt-4 text-center text-sm-start">
+          <div class="hero-stats row mt-3 pt-4 text-center text-sm-start">
             <div class="col-4">
               <div class="stat-item">
                 <div class="stat-number text-warning fw-bold fs-3">10K+</div>
@@ -49,30 +52,40 @@
       
       <div class="col-lg-6 d-none d-lg-block">
         <div class="hero-visual position-relative">
-          <!-- Imagens flutuantes de produtos -->
+          <!-- Imagens flutuantes GIGANTES com nomes compactos -->
           <div class="floating-card card-1">
             <div class="product-mini-card">
-              <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" 
-                   alt="Fortnite" class="img-fluid rounded">
-              <div class="price-tag">R$ 349,90</div>
+              <img [src]="getCategoriaImagem('free-fire')" 
+                  alt="Fortnite" class="img-fluid rounded-4 shadow-xxl">
+              <div class="game-name-tag bg-dark bg-opacity-75 text-white fw-bold px-3 py-2">
+                FREE FIRE
+              </div>
             </div>
           </div>
           <div class="floating-card card-2">
             <div class="product-mini-card">
-              <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" 
-                   alt="Free Fire" class="img-fluid rounded">
-              <div class="price-tag">R$ 149,90</div>
+              <img [src]="getCategoriaImagem('valorant')" 
+                  alt="Free Fire" class="img-fluid rounded-4 shadow-xxl">
+              <div class="game-name-tag bg-dark bg-opacity-75 text-white fw-bold px-3 py-2">
+                VALORANT
+              </div>
             </div>
           </div>
           <div class="floating-card card-3">
             <div class="product-mini-card">
-              <img src="https://images.unsplash.com/photo-1620336655055-bd87b4274d6f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" 
-                   alt="Valorant" class="img-fluid rounded">
-              <div class="price-tag">R$ 99,90</div>
+              <img [src]="getCategoriaImagem('roblox')" 
+                  alt="Valorant" class="img-fluid rounded-4 shadow-xxl">
+              <div class="game-name-tag bg-dark bg-opacity-75 text-white fw-bold px-3 py-2">
+                ROBLOX
+              </div>
             </div>
           </div>
+          
+          <!-- Efeito de brilho adicional -->
+          <div class="hero-glow"></div>
         </div>
       </div>
+
     </div>
   </div>
   
@@ -80,56 +93,22 @@
   <div class="hero-bg"></div>
 </section>
 
-<!-- Barra de Busca Destaque -->
-<section class="search-section py-4 bg-dark">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <app-search-bar (buscaRealizada)="onBuscaRealizada($event)"></app-search-bar>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Categorias em Destaque -->
-<section class="categories-section py-5 bg-light">
-  <div class="container">
-    <div class="section-header text-center mb-5">
-      <h2 class="display-5 fw-bold text-dark mb-3 font-rajdhani">🎮 Categorias Populares</h2>
-      <p class="text-muted fs-5">Escolha seu jogo favorito e encontre os melhores produtos</p>
-    </div>
-    
-    <div class="row g-4">
-      <div class="col-md-6 col-lg-4 col-xl-3" *ngFor="let categoria of categoriasDestaque">
-        <app-category-card [categoria]="categoria"></app-category-card>
-      </div>
-    </div>
-    
-    <div class="text-center mt-5">
-      <button class="btn btn-outline-dark btn-lg">
-        Ver Todas as Categorias
-        <i class="bi bi-arrow-right ms-2"></i>
-      </button>
-    </div>
-  </div>
-</section>
-
 <!-- Produtos em Destaque -->
-<section class="featured-products py-5 bg-dark">
+<section class="featured-products py-4 bg-secondary-subtle">
   <div class="container">
-    <div class="section-header text-center mb-5">
-      <h2 class="display-5 fw-bold text-white mb-3 font-rajdhani">⭐ Produtos em Destaque</h2>
-      <p class="text-light fs-5">Os mais vendidos da semana com entrega instantânea</p>
+    <div class="section-header text-center mb-4">
+      <h2 class="display-5 fw-bold text-dark mb-0 font-rajdhani">⭐ Mais Vendidos</h2>
+      <p class="text-muted fs-5">Os mais vendidos da semana com entrega imediata</p>
     </div>
     
     <div class="row g-4">
-      <div class="col-md-6 col-lg-4 col-xl-3" *ngFor="let produto of produtosDestaque">
+      <div class="col-6 col-md-6 col-lg-3" *ngFor="let produto of produtosDestaque">
         <app-product-card [produto]="produto"></app-product-card>
       </div>
     </div>
     
     <div class="text-center mt-5">
-      <button class="btn btn-warning btn-lg fw-bold">
+      <button class="btn btn-warning btn-lg fw-bold" routerLink="/produtos">
         Ver Todos os Produtos
         <i class="bi bi-arrow-right ms-2"></i>
       </button>
@@ -137,20 +116,43 @@
   </div>
 </section>
 
-<!-- Por que Escolher GGBundles -->
-<section class="features-section py-5 bg-light">
+<!-- Categorias em Destaque -->
+<section class="categories-section py-5 bg-dark">
   <div class="container">
     <div class="section-header text-center mb-5">
-      <h2 class="display-5 fw-bold text-dark mb-3 font-rajdhani">🚀 Por que Escolher GGBundles?</h2>
+      <h2 class="display-5 fw-bold text-white mb-0 font-rajdhani">🎮 Games Populares</h2>
+      <p class="text-light fs-5">Escolha seu jogo favorito e encontre os melhores produtos</p>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-12 col-md-6 col-lg-4" *ngFor="let categoria of categoriasDestaque">
+        <app-category-card [categoria]="categoria"></app-category-card>
+      </div>
+    </div>
+    
+    <div class="text-center mt-5">
+      <button class="btn btn-warning btn-lg" routerLink="/categorias">
+        Ver Todas as Categorias
+        <i class="bi bi-arrow-right ms-2"></i>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Por que Escolher esse site -->
+<section class="features-section py-5 bg-secondary-subtle">
+  <div class="container">
+    <div class="section-header text-center mb-3">
+      <h2 class="display-5 fw-bold text-dark mb-3 font-rajdhani">🚀 Por que na {{siteInfo?.nome || 'Game Commerce'}}?</h2>
     </div>
     
     <div class="row g-4">
       <div class="col-md-4 text-center">
         <div class="feature-card p-4">
           <div class="feature-icon mb-3">
-            <i class="bi bi-lightning-charge-fill text-warning fs-1"></i>
+            <i class="bi bi-lightning-charge-fill text-warning"></i>
           </div>
-          <h4 class="fw-bold mb-3">Entrega Instantânea</h4>
+          <h4 class="fw-bold text-dark mb-3">Entrega Instantânea</h4>
           <p class="text-muted">Receba seus produtos em segundos via email ou direct</p>
         </div>
       </div>
@@ -158,9 +160,9 @@
       <div class="col-md-4 text-center">
         <div class="feature-card p-4">
           <div class="feature-icon mb-3">
-            <i class="bi bi-shield-check text-warning fs-1"></i>
+            <i class="bi bi-shield-check text-warning"></i>
           </div>
-          <h4 class="fw-bold mb-3">100% Seguro</h4>
+          <h4 class="fw-bold text-dark mb-3">100% Seguro</h4>
           <p class="text-muted">Transações protegidas e produtos oficiais</p>
         </div>
       </div>
@@ -168,9 +170,9 @@
       <div class="col-md-4 text-center">
         <div class="feature-card p-4">
           <div class="feature-icon mb-3">
-            <i class="bi bi-headset text-warning fs-1"></i>
+            <i class="bi bi-headset text-warning"></i>
           </div>
-          <h4 class="fw-bold mb-3">Suporte 24/7</h4>
+          <h4 class="fw-bold text-dark mb-3">Suporte 24/7</h4>
           <p class="text-muted">Nossa equipe está sempre pronta para ajudar</p>
         </div>
       </div>
@@ -179,7 +181,7 @@
 </section>
 
 <!-- Newsletter -->
-<section class="newsletter-section py-5 bg-primary">
+<section class="newsletter-section py-5">
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-6 text-center text-lg-start mb-4 mb-lg-0">

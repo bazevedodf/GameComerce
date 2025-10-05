@@ -1,173 +1,208 @@
-:host {
-  display: block;
-}
-
-/* Hero Section */
-.hero-section {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.min-vh-80 {
-  min-height: 80vh;
-}
-
-.hero-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 80%, rgba(255, 193, 7, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 193, 7, 0.05) 0%, transparent 50%);
-  z-index: 0;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 2;
-}
-
+/* Hero Section - Imagens MÁXIMAS */
 .hero-visual {
-  height: 500px;
+  height: 800px; // Container ENORME
   position: relative;
 }
 
 .floating-card {
   position: absolute;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease;
+  border-radius: 24px;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+  transition: all 0.6s ease;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  //padding: 15px;
   
   &:hover {
-    transform: translateY(-10px);
+    transform: translateY(-25px) scale(1.1);
+    box-shadow: 0 60px 120px rgba(0, 0, 0, 0.7), 
+                0 0 80px rgba(255, 193, 7, 0.4);
   }
   
   &.card-1 {
     top: 10%;
-    left: 10%;
-    animation: float 6s ease-in-out infinite;
+    left: -5%;
+    animation: float-giant 12s ease-in-out infinite;
+    z-index: 3;
   }
   
   &.card-2 {
-    top: 30%;
-    right: 10%;
-    animation: float 6s ease-in-out infinite 2s;
+    top: 15%;
+    right: -10%;
+    animation: float-giant 12s ease-in-out infinite 4s;
+    z-index: 2;
   }
   
   &.card-3 {
-    bottom: 20%;
-    left: 20%;
-    animation: float 6s ease-in-out infinite 4s;
+    bottom: 10%;
+    left: 15%;
+    animation: float-giant 12s ease-in-out infinite 8s;
+    z-index: 1;
   }
+}
+
+.feature-icon{
+  i {
+    font-size: 3.5rem;
+  }
+}
+
+.newsletter-section{
+  background: #020024;
+  background: linear-gradient(180deg,rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 0.84) 48%, rgba(0, 145, 255, 1) 100%);
 }
 
 .product-mini-card {
   position: relative;
-  width: 120px;
+  width: 400px; // MÁXIMO - 400px de largura!
   
   img {
-    border-radius: 8px;
-  }
-  
-  .price-tag {
-    position: absolute;
-    bottom: -10px;
-    right: -10px;
-    background: #ffc107;
-    color: #000;
-    padding: 4px 8px;
     border-radius: 20px;
-    font-size: 0.8rem;
+    width: 100%;
+    height: auto;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    min-height: 250px;
+    object-fit: cover;
+  }
+  
+  .game-name-tag {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem; // NOME MENOR
     font-weight: bold;
-    box-shadow: 0 2px 10px rgba(255, 193, 7, 0.3);
-  }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-}
-
-.hero-stats {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Sections */
-.section-header {
-  .display-5 {
-    font-size: 2.5rem;
-  }
-}
-
-/* Features */
-.feature-card {
-  transition: transform 0.3s ease;
-  
-  &:hover {
-    transform: translateY(-5px);
-    
-    .feature-icon {
-      transform: scale(1.1);
-    }
-  }
-}
-
-.feature-icon {
-  transition: transform 0.3s ease;
-}
-
-/* Newsletter */
-.newsletter-section {
-  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
-}
-
-.newsletter-form {
-  .form-control {
-    border: none;
-    padding: 12px 20px;
-    
-    &:focus {
-      box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
-    }
-  }
-  
-  .btn {
-    white-space: nowrap;
-  }
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-  .hero-section {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    min-width: 120px;
     text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 10;
+    
+    &:hover {
+      transform: translateX(-50%) scale(1.05);
+      transition: transform 0.3s ease;
+      //background: rgba(255, 193, 7, 0.9);
+      box-shadow: 0 60px 120px rgba(0, 0, 0, 0.7), 0 0 80px rgba(255, 193, 7, 0.4);
+      color: #000;
+    }
+  }
+}
+
+/* Animação para imagens MÁXIMAS */
+@keyframes float-giant {
+  0%, 100% { 
+    transform: translateY(0px) rotate(-2deg); 
+  }
+  20% { 
+    transform: translateY(-40px) rotate(1deg); 
+  }
+  40% { 
+    transform: translateY(-20px) rotate(-3deg); 
+  }
+  60% { 
+    transform: translateY(-35px) rotate(2deg); 
+  }
+  80% { 
+    transform: translateY(-15px) rotate(-1deg); 
+  }
+}
+
+/* Efeito de brilho MAIOR */
+.hero-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(255, 193, 7, 0.15) 0%, transparent 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Ajustes de layout para imagens MÁXIMAS */
+.hero-section {
+  .hero-content {
+    //padding-right: 4rem;
+  }
+}
+
+/* Sombra extra gigante */
+.shadow-xxl {
+  box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Responsividade para imagens MÁXIMAS */
+@media (max-width: 1600px) {
+  .product-mini-card {
+    width: 350px; // Um pouco menor em telas muito grandes
   }
   
-  .hero-actions {
-    justify-content: center !important;
+  .hero-visual {
+    height: 650px;
   }
-  
-  .hero-stats {
-    text-align: center !important;
+}
+
+@media (max-width: 1400px) {
+  .product-mini-card {
+    width: 320px;
   }
   
   .floating-card {
-    display: none;
-  }
-  
-  .min-vh-80 {
-    min-height: 60vh;
+    &.card-1 {
+      left: -5%;
+    }
+    &.card-2 {
+      right: -5%;
+    }
+    &.card-3 {
+      left: 8%;
+    }
   }
 }
 
-@media (max-width: 576px) {
-  .display-4 {
-    font-size: 2rem;
+@media (max-width: 1200px) {
+  .product-mini-card {
+    width: 280px; // Ainda muito grande
   }
   
-  .hero-actions {
-    flex-direction: column;
+  .hero-visual {
+    height: 700px;
+  }
+}
+
+@media (max-width: 992px) {
+  .hero-visual {
+    height: 600px;
+  }
+  
+  .product-mini-card {
+    width: 240px; // Ainda impressionante em tablets
+  }
+  
+  .game-name-tag {
+    font-size: 0.8rem !important;
+    padding: 6px 16px !important;
+    min-width: 100px !important;
+  }
+}
+
+/* Garantir que as imagens carreguem corretamente */
+.product-mini-card img {
+  background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+}
+
+/* Ajuste para garantir que não sobreponha o conteúdo */
+@media (max-width: 768px) {
+  .hero-visual {
+    display: none;
   }
 }

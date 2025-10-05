@@ -1,0 +1,193 @@
+// product-detail.component.scss - COMPLETO
+.product-image-container {
+  background: #2d2d2d;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  border: 1px solid #444;
+  
+  .product-image {
+    width: 70%;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+}
+
+.product-info {
+  background: #2d2d2d;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  border: 1px solid #444;
+}
+
+.product-title {
+  font-size: 2rem;
+  color: #ffffff;
+}
+
+.price-section {
+  .discount-badge{
+    margin-top: 15px;
+    height: 20px;
+  }
+  
+  .current-price {
+    font-size: 2.1rem;
+    color: #ffffff;
+  }
+}
+
+.details-section{
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quantity-controls {
+  .quantity-display {
+    font-size: 1.2rem;
+    font-weight: bold;
+    min-width: 50px;
+    text-align: center;
+    color: #ffffff;
+  }
+  
+  .btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-color: #6c757d;
+    color: #ffffff;
+    
+    &:hover {
+      border-color: #ffc107;
+      background-color: #ffc107;
+      color: #000000;
+    }
+  }
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  border: none;
+  color: #ffffff;
+  font-weight: bold;
+  
+  &:hover {
+    background: linear-gradient(135deg, #20c997, #198754);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  }
+}
+
+.text-muted {
+  color: #adb5bd !important;
+}
+
+.badge.bg-warning {
+  background: linear-gradient(135deg, #ffc107, #ffb300) !important;
+  color: #000000;
+}
+
+.badge.bg-danger {
+  background: linear-gradient(135deg, #e03131, #c92a2a) !important;
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #ffc107, #ffb300);
+  border: none;
+  color: #000000;
+  font-weight: bold;
+  
+  &:hover {
+    background: linear-gradient(135deg, #ffb300, #ff9800);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+  }
+}
+
+// ✅ CAROUSEL - CLASSES COMPLETAS
+.related-products {
+  background: #2d2d2d;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 1px solid #444;  
+  .carousel-container {
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  .carousel-track {
+    display: flex;
+    transition: transform 0.3s ease;
+  }
+
+  .carousel-slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+  }
+
+  .carousel-btn {
+    width: 40px;
+    height: 40px;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.7) !important;
+    
+    &:hover:not(:disabled) {
+      background: rgba(255, 193, 7, 0.9) !important;
+      color: #000000;
+    }
+    
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  }
+
+  .carousel-indicators {
+    .indicator-btn {
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+}
+
+.carousel-track {
+  display: flex;
+}
+
+.carousel-slide {
+  flex: 0 0 100%;
+  width: 100%;
+}
+
+.carousel-slide .product-card {
+  margin: 0 auto;
+  max-width: 300px;
+}
+
+@media (max-width: 768px) {
+  .product-title {
+    font-size: 1.5rem;
+  }
+  
+  .price-section .current-price {
+    font-size: 2rem;
+  }
+  
+  .product-image-container,
+  .product-info {
+    padding: 1rem;
+  }
+
+  .carousel-container {
+    margin: 0 -10px;
+  }
+  
+  .carousel-slide {
+    padding: 0 65px;
+  }
+}

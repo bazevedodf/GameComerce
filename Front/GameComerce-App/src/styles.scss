@@ -27,6 +27,18 @@ body {
   background-color: var(--body-bg);
 }
 
+// Backdrop do Bootstrap customizado
+.modal-backdrop {
+  background: rgba(18, 18, 18, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  opacity: 1 !important;
+}
+
+.modal-backdrop.show {
+  opacity: 1 !important;
+}
+
 /* ===== CLASSES UTILITÁRIAS ===== */
 .bg-card {
   background-color: #1a1a1a !important;

@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
 import { Categoria } from 'src/app/model/Categoria';
 
 @Component({
@@ -11,10 +12,14 @@ export class CategoryCardComponent {
   @Input() categoria!: Categoria;
   @Input() tamanho: 'pequeno' | 'medio' | 'grande' = 'medio';
 
+  constructor(private router: Router) {}
+
   navegarParaCategoria(): void {
-    console.log('Navegando para categoria:', this.categoria.name);
-    console.log('Slug:', this.categoria.slug);
-    // Implementar navegação para a categoria
+    this.router.navigate(['/produtos'], {
+      queryParams: { 
+        categoria: this.categoria.slug 
+      }
+    });
   }
 
 }

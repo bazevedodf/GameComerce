@@ -4,24 +4,29 @@
     <!-- Ícone de Busca -->
     <span class="input-group-text bg-dark border-secondary text-light">
       <i class="bi bi-search"></i>
+      <span class="visually-hidden">Buscar</span>
     </span>
     
     <!-- Campo de Busca -->
     <input type="text" 
-           class="form-control bg-dark text-light border-secondary"
-           placeholder="Buscar V-Bucks, diamantes, skins, pacotes..."
-           (input)="onBuscar()"
-           (focus)="onFocus()"
-           (blur)="onBlur()"
-           [(ngModel)]="termoBusca"
-           #searchInput>
+       class="form-control bg-dark text-light border-secondary"
+       placeholder="Buscar Robux, V-Bucks, diamantes..."
+       (input)="onBuscar()"
+       (focus)="onFocus()"
+       (blur)="onBlur()"
+       [(ngModel)]="termoBusca"
+       #searchInput
+       aria-label="Termo de busca"
+       aria-describedby="search-icon">
     
     <!-- Botão de Filtro -->
     <button class="btn btn-outline-secondary border-secondary text-light dropdown-toggle"
-            type="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-            [class.active]="categoriaFiltro">
+        type="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        [class.active]="categoriaFiltro"
+        aria-haspopup="true"
+        aria-label="Filtrar resultados">
       <i class="bi bi-funnel"></i>
       <span class="d-none d-md-inline ms-1">Filtrar</span>
     </button>
@@ -31,9 +36,11 @@
       <li><h6 class="dropdown-header">Filtrar por Categoria</h6></li>
       <li>
         <a class="dropdown-item" 
-           [class.active]="!categoriaFiltro"
-           (click)="aplicarFiltroCategoria('')">
-           Todas as categorias
+          [class.active]="!categoriaFiltro"
+          (click)="aplicarFiltroCategoria('')"
+          role="button"
+          tabindex="0">
+          Todas as categorias
         </a>
       </li>
       <li><hr class="dropdown-divider"></li>
@@ -52,13 +59,16 @@
        *ngIf="mostrarSugestoes && sugestoes.length > 0">
     <div class="card-body p-2">
       <div *ngFor="let sugestao of sugestoes" 
-           class="suggestion-item p-2 rounded hover-bg-primary"
-           (mousedown)="selecionarSugestao(sugestao)">
+          class="suggestion-item p-2 rounded hover-bg-primary"
+          (mousedown)="selecionarSugestao(sugestao)"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="'Selecionar ' + sugestao.nome + ' - R$ ' + sugestao.preco.toFixed(2)">
         <div class="d-flex align-items-center">
           <i class="bi bi-search me-2 text-muted"></i>
           <div class="flex-grow-1">
             <div class="fw-semibold text-light">{{ sugestao.nome }}</div>
-            <small class="text-muted">{{ sugestao.categoria }} • {{ sugestao.plataforma }}</small>
+            <small class="text-muted">{{ sugestao.categoria.name }}</small>
           </div>
           <div class="text-warning small">
             R$ {{ sugestao.preco.toFixed(2) }}

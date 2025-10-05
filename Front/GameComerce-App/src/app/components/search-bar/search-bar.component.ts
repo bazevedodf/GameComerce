@@ -1,4 +1,5 @@
 import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { Categoria } from 'src/app/model/Categoria';
 import { Produto } from 'src/app/model/Produto';
 import { CategoriaService } from 'src/app/services/categoria.service';
@@ -20,19 +21,30 @@ export class SearchBarComponent implements OnInit {
   mostrarModalMobile: boolean = false;
   
   categorias: Categoria[] = [];
+  produtos: Produto[] = [];
   sugestoes: any[] = [];
 
   constructor(
     private categoriaService: CategoriaService,
-    private produtoService: ProdutoService
+    private produtoService: ProdutoService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
     this.carregarCategorias();
+    this.carregarProdutos();
   }
 
   carregarCategorias(): void {
-    this.categorias = this.categoriaService.getCategorias();
+    this.categoriaService.getCategorias().subscribe(categorias => {
+      this.categorias = categorias;
+    });
+  }
+
+  carregarProdutos(): void {
+    this.produtoService.getProdutos().subscribe(produtos => {
+      this.produtos = produtos;
+    });
   }
 
   onBuscar(): void {
@@ -58,9 +70,8 @@ export class SearchBarComponent implements OnInit {
   }
 
   buscarSugestoes(): void {
-    const produtos = this.produtoService.getProdutos();
-    
-    this.sugestoes = produtos
+   
+    this.sugestoes = this.produtos
       .filter(produto => 
         produto.nome.toLowerCase().includes(this.termoBusca.toLowerCase()) ||
         produto.descricao.toLowerCase().includes(this.termoBusca.toLowerCase()) ||
@@ -89,20 +100,26 @@ export class SearchBarComponent implements OnInit {
   }
 
   realizarBusca(): void {
-    const resultados = {
-      termo: this.termoBusca,
-      categoria: this.categoriaFiltro,
-      produtos: this.obterResultadosBusca()
-    };
-
-    this.buscaRealizada.emit(resultados);
+    // Navega para a página de produtos com os parâmetros de busca
+    const queryParams: any = {};
     
-    // Focar no input novamente após busca
+    if (this.termoBusca) {
+      queryParams.busca = this.termoBusca;
+    }
+    
+    if (this.categoriaFiltro) {
+      queryParams.categoria = this.categoriaFiltro;
+    }
+
+    // Navega para /produtos com os parâmetros de busca
+    this.router.navigate(['/produtos'], { queryParams });
+    
+    // Foca no input novamente após busca (opcional)
     this.searchInput.nativeElement.focus();
   }
 
   obterResultadosBusca(): Produto[] {
-    let produtos = this.produtoService.getProdutos();
+    let produtos = [...this.produtos];
 
     // Aplicar filtro de termo
     if (this.termoBusca) {
@@ -115,12 +132,9 @@ export class SearchBarComponent implements OnInit {
 
     // Aplicar filtro de categoria
     if (this.categoriaFiltro) {
-      const categoria = this.categoriaService.getCategoriaPorSlug(this.categoriaFiltro);
-      if (categoria) {
-        produtos = produtos.filter(produto => 
-          produto.plataforma.toLowerCase() === categoria.name.toLowerCase()
-        );
-      }
+      produtos = produtos.filter(produto => 
+        produto.categoria.slug === this.categoriaFiltro
+      );
     }
 
     return produtos;

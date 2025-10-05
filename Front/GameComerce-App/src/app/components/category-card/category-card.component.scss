@@ -1,0 +1,110 @@
+:host {
+  display: block;
+}
+
+.category-card {
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+  background: rgba(49, 49, 49, 0.9);
+  
+  &:hover {
+    transform: translateY(-8px);
+    //box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25) !important;
+    box-shadow: 0 60px 120px rgba(0, 0, 0, 0.7), 0 0 80px rgba(255, 193, 7, 0.4) !important;
+    
+    .category-image {
+      transform: scale(1.1);
+    }
+    
+    .category-action {
+      transform: translateX(5px);
+    }
+  }
+}
+
+.category-image-container {
+  position: relative;
+  overflow: hidden;
+  height: 200px;
+}
+
+.category-image {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.category-overlay {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.1) 30%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  pointer-events: none;
+}
+
+.card-body {
+  background: transparent;
+  padding: 1.5rem;
+}
+
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.category-action {
+  transition: transform 0.3s ease;
+}
+
+// Tamanhos diferentes
+.category-card-small {
+  .category-image-container {
+    height: 120px;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .card-title {
+    font-size: 0.9rem !important;
+  }
+}
+
+.category-card-medium {
+  .category-image-container {
+    height: 160px;
+  }
+}
+
+.category-card-large {
+  .category-image-container {
+    height: 240px;
+  }
+  
+  .card-title {
+    font-size: 1.25rem !important;
+  }
+}
+
+// Badge personalizado
+.badge.bg-warning {
+  font-size: 0.7rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .category-image-container {
+    height: 150px !important;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+}

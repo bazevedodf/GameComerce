@@ -1,0 +1,138 @@
+<!-- cart-sidebar.component.html -->
+<div class="cart-sidebar-overlay" 
+     [class.show]="isOpen"
+     (click)="closeSidebar()">
+</div>
+
+<div class="cart-sidebar" [class.open]="isOpen">
+  
+  <!-- Header do Carrinho -->
+  <div class="cart-header bg-dark text-light p-3 border-bottom border-secondary">
+    <div class="d-flex align-items-center justify-content-between">
+      <h5 class="mb-0 fw-bold font-rajdhani">
+        <i class="bi bi-cart3 me-2"></i>
+        Meu Carrinho
+        <span class="badge bg-warning text-dark ms-2" *ngIf="getTotalItens() > 0">
+          {{ getTotalItens() }}
+        </span>
+      </h5>
+      <button class="btn btn-sm btn-outline-light" (click)="closeSidebar()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Lista de Itens -->
+  <div class="cart-items flex-grow-1 p-3" *ngIf="cartItems.length > 0; else emptyCart">
+    
+    <div class="cart-item mb-3 pb-3 border-bottom border-secondary" 
+         *ngFor="let item of cartItems">
+      
+      <div class="d-flex gap-3">
+        <!-- Imagem do Produto -->
+        <div class="cart-item-image flex-shrink-0">
+          <img [src]="item.produto.imagem" 
+               [alt]="item.produto.nome"
+               class="rounded-2"
+               style="width: 90px; height: 90px; object-fit: cover;">
+        </div>
+
+        <!-- Informações do Produto -->
+        <div class="cart-item-info flex-grow-1">
+          <h6 class="cart-item-title text-light mb-1 fw-semibold small">
+            {{ item.produto.nome }}
+          </h6>
+          <p class="cart-item-platform text-light mb-2 small">
+            {{ item.produto.plataforma }}
+          </p>
+          
+          <!-- Controles de Quantidade -->
+          <div class="cart-item-controls d-flex align-items-center justify-content-between">
+            <div class="quantity-controls d-flex align-items-center gap-2">
+              <button class="btn btn-sm btn-outline-secondary"
+                      (click)="alterarQuantidade(item.produto.id, item.quantidade - 1)"
+                      [disabled]="item.quantidade <= 1">
+                <i class="bi bi-dash"></i>
+              </button>
+              
+              <span class="quantity-badge bg-dark text-light px-2 py-1 rounded">
+                {{ item.quantidade }}
+              </span>
+              
+              <button class="btn btn-sm btn-outline-secondary"
+                      (click)="alterarQuantidade(item.produto.id, item.quantidade + 1)">
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+
+            <!-- Preço e Remover -->
+            <div class="cart-item-actions d-flex align-items-center gap-2">
+              <span class="text-warning fw-bold small">
+                R$ {{ (item.produto.preco * item.quantidade).toFixed(2) }}
+              </span>
+              <button class="btn btn-sm btn-outline-danger"
+                      (click)="removerItem(item.produto.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Carrinho Vazio -->
+  <ng-template #emptyCart>
+    <div class="empty-cart text-center py-5">
+      <i class="bi bi-cart-x display-4 text-light mb-3"></i>
+      <p class="text-light mb-4">Seu carrinho está vazio</p>
+      <button class="btn btn-warning fw-bold" (click)="closeSidebar()">
+        Continuar Comprando
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- Resumo do Pedido -->
+  <div class="cart-summary bg-dark border-top border-secondary p-3" 
+       *ngIf="cartItems.length > 0">
+    
+    <div class="summary-item d-flex justify-content-between mb-2">
+      <span class="text-light">Subtotal:</span>
+      <span class="text-light">R$ {{ subtotal.toFixed(2) }}</span>
+    </div>
+    
+    <div class="summary-item d-flex justify-content-between mb-2">
+      <span class="text-light">Frete:</span>
+      <span class="text-light" [class.text-success]="frete === 0">
+        {{ frete === 0 ? 'Grátis' : 'R$ ' + frete.toFixed(2) }}
+      </span>
+    </div>
+    
+    <div class="summary-item d-flex justify-content-between mb-3">
+      <span class="text-light fw-bold">Total:</span>
+      <span class="text-warning fw-bold fs-5">R$ {{ total.toFixed(2) }}</span>
+    </div>
+
+    <!-- Ações -->
+    <div class="cart-actions d-grid gap-2">
+      <button class="btn btn-success fw-bold py-2" (click)="irParaCheckout()">
+        <i class="bi bi-lock-fill me-2"></i>
+        Finalizar Compra
+      </button>
+      
+      <button class="btn btn-warning" (click)="continuarComprando()">
+        <i class="bi bi-cart3 me-1"></i>
+        Continuar Comprando
+      </button>
+      
+      <button class="btn btn-outline-danger btn-sm"
+              (click)="limparCarrinho()">
+        <i class="bi bi-trash me-1"></i>
+        Limpar Carrinho
+      </button>
+    </div>
+
+  </div>
+
+</div>

@@ -8,4 +8,5 @@ export interface SiteInfo {
   instagram?: string;
   facebook?: string;
   whatsapp?: string;
+  youTube?: string;
 }

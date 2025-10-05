@@ -1,0 +1,414 @@
+    // Cores personalizadas conforme especificação
+$bg-primary: #0e0e0e;
+$text-primary: #ffffff;
+$text-secondary: #9ca3af;
+$border-color: #374151;
+$success-color: #22c55e;
+
+.shopping-cart-page {
+  background: $bg-primary;
+  color: $text-primary;
+
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: .5rem;
+  }
+
+  .cart-payment-info h2 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  
+}
+
+.cart-payment-info .payment-method .pix-option .pix-icon {
+  font-size: 1.5rem;
+  color: #2e9b6f;
+}
+
+// Textos
+.text-white {
+  color: $text-primary !important;
+}
+
+.text-subtitle {
+  color: $text-secondary !important;
+}
+
+.text-success {
+  color: $success-color !important;
+}
+
+// Cards e bordas
+.border-custom {
+  border: 1px solid rgba(255, 255, 255, .15) !important;
+}
+
+.payment-card,
+.products-card,
+.summary-card {
+  background: $bg-primary !important;
+  border: 1px solid rgba(255, 255, 255, .15) !important;
+}
+
+// Seção PIX
+.pix-section {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .75rem;
+    background: #2020204d;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, .15);
+
+    .pix-icon {
+        font-size: 1.5rem;
+        color: #2e9b6f;
+    }
+
+}
+
+.cart-item{
+    display: grid;
+    grid-template-columns: 60px minmax(200px, 1fr) 160px 100px;
+    gap: 1.5rem;
+    padding: 1.2rem;
+    background: #2020204d;
+    border-radius: 8px;
+    margin-bottom: .75rem;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, .15);
+    box-shadow: 0 4px 12px #00000026;
+    transition: transform .2s ease, border-color .2s ease;
+}
+
+.cart-payment-info .email-form .form-group input {
+    width: 100%;
+    padding: .75rem 12px;
+    background: #2020204d;
+    border: 1px solid rgba(255, 255, 255, .15);
+    border-radius: 8px;
+    color: #fff;
+    font-size: .9rem;
+}
+
+// Inputs personalizados
+.custom-input {
+  background: #2020204d !important;
+  border: 1px solid rgba(255, 255, 255, .15) !important;
+  border-radius: 8px !important;
+  color: #fff !important;
+  font-size: .9rem !important;
+
+  &:focus {
+    background: $bg-primary;
+    border-color: $success-color !important;
+    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
+    color: $text-primary;
+  }
+
+  &::placeholder {
+    color: $text-secondary !important;
+  }
+}
+
+// Estilos para validação do cupom
+.coupon-section {
+  .input-group {
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+  
+  .valid-feedback {
+    display: block;
+  }
+}
+
+// Spinner para validação do cupom
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+// Botão amarelo personalizado para limpar cupom
+.btn-warning {
+  background: linear-gradient(135deg, #ffc107, #ffb300) !important;
+  border: none !important;
+  color: #000000 !important;
+  font-weight: 500;
+  
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ffb300, #ff9800) !important;
+    color: #000000 !important;
+  }
+}
+
+// Estilos para validação do cupom
+.coupon-section {
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .valid-feedback {
+    display: block;
+  }
+  
+  // Campo desabilitado com estilo personalizado
+  .custom-input:disabled {
+    background: #374151 !important;
+    border-color: #6b7280 !important;
+    color: #9ca3af !important;
+    cursor: not-allowed;
+  }
+}
+
+// Botões verdes personalizados
+.btn-success-custom {
+  background: $success-color !important;
+  border: none !important;
+  color: $text-primary !important;
+  
+  &:hover {
+    background: darken($success-color, 10%) !important;
+    color: $text-primary !important;
+  }
+}
+
+// Botões de quantidade
+.btn-quantity {
+  background: $success-color !important;
+  border: none !important;
+  color: $text-primary !important;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  
+  &:hover:not(:disabled) {
+    background: darken($success-color, 10%) !important;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Link excluir
+.exclude-link {
+  color: $success-color !important;
+  
+  &:hover {
+    color: darken($success-color, 10%) !important;
+  }
+}
+
+// Imagem do produto
+.product-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+// Textos de quantidade e preço
+.quantity-text,
+.price-text {
+  color: $text-primary !important;
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .product-image {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .btn-quantity {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+// ===== MODAL PIX - CSS COMPLETO =====
+
+// Backdrop do Bootstrap customizado
+.modal-backdrop {
+  background: rgba(18, 18, 18, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  opacity: 1 !important;
+}
+
+.modal-backdrop.show {
+  opacity: 1 !important;
+}
+
+// Container principal do modal
+.custom-modal {
+  background: #121212 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 16px !important;
+  color: #fff !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+// Cabeçalho do modal
+.modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  padding: 1.5rem 1.5rem 1rem;
+  
+  .modal-title {
+    color: #ffffff !important;
+    font-weight: 600;
+    font-size: 1.25rem;
+  }
+  
+  .btn-close {
+    filter: invert(1) brightness(2);
+    opacity: 0.8;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+// Corpo do modal
+.modal-body {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+// QR Code
+.modal-body .mb-4 {
+  margin-bottom: 2rem !important;
+  
+  img {
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+}
+
+// Código PIX
+.pix-code {
+  background: #000000 !important;
+  border: 1px solid #374151 !important;
+  border-radius: 8px !important;
+  padding: 1rem !important;
+  margin-bottom: 1.5rem !important;
+  word-break: break-all;
+  
+  code {
+    font-family: monospace !important;
+    font-size: 1rem !important;
+    line-height: 1.4 !important;
+    color: #ffffff !important;
+  }
+}
+
+// Texto de instruções
+.modal-body .text-subtitle {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin-bottom: 0;
+}
+
+// Rodapé do modal
+.modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+  padding: 1rem 1.5rem 1.5rem;
+  gap: 0.75rem;
+  
+  .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 0.625rem 1.5rem;
+  }
+  
+  .btn-outline-light {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .btn-success-custom {
+    background: #22c55e !important;
+    border: none !important;
+    color: #ffffff !important;
+  }
+}
+
+// Animações de entrada do modal
+.modal.fade .modal-content {
+  transform: scale(0.9);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.modal.show .modal-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+// Responsividade
+@media (max-width: 576px) {
+  .modal-dialog {
+    margin: 1rem;
+  }
+  
+  .modal-header {
+    padding: 1.25rem 1.25rem 0.75rem;
+  }
+  
+  .modal-body {
+    padding: 1.25rem;
+  }
+  
+  .modal-footer {
+    padding: 0.75rem 1.25rem 1.25rem;
+    flex-direction: column;
+    
+    .btn {
+      width: 100%;
+    }
+  }
+  
+  .pix-code {
+    padding: 0.75rem !important;
+  }
+  
+  .modal-body .mb-4 img {
+    max-width: 200px;
+  }
+}
+
+// Progress Bar e Temporizador
+.progress-bar-container {
+  .progress {
+    border-radius: 4px;
+    overflow: hidden;
+    
+    .progress-bar {
+      transition: width 1s linear;
+      border-radius: 4px;
+    }
+  }
+}
+
+// Ícones de sucesso/erro
+.success-icon, .error-icon {
+  i {
+    animation: fadeIn 0.5s ease-in;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}

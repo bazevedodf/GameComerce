@@ -1,3 +1,5 @@
+import { Categoria } from "./Categoria";
+
 export interface Produto {
     id: number;
     nome: string;
@@ -6,7 +8,7 @@ export interface Produto {
     precoOriginal: number;
     desconto: number;
     imagem: string;
-    categoria: string;
+    categoria: Categoria;
     avaliacao: number;
     totalAvaliacoes: number;
     tags: string[];
