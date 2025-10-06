@@ -2,19 +2,21 @@ import { Injectable } from '@angular/core';
 import { Produto } from '../model/Produto';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, tap } from 'rxjs';
+import { environment } from '@environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProdutoService {
   
-  private useMock = true; // Mude para false quando API estiver pronta
+  private useMock = false; // Mude para false quando API estiver pronta
   private produtosCache: Produto[] = [];
   private produtosDestaqueCache: Produto[] = [];
-  private apiUrl = 'https://sua-api.com/api';
+  private apiUrl = environment.apiUrl+'Produtos';
+  private imgUrl = environment.imgUrl;
 
   constructor(private http: HttpClient) {
-    this.carregarProdutosIniciais();
+
   }
 
   private carregarProdutosIniciais(): void {
@@ -255,28 +257,9 @@ export class ProdutoService {
     if (this.useMock) {
       return of(this.produtosCache);
     } else {
-      return this.http.get<Produto[]>(`${this.apiUrl}/produtos`).pipe(
+      return this.http.get<Produto[]>(this.apiUrl).pipe(
         tap(produtos => {
           this.produtosCache = produtos; // Atualiza cache com dados da API
-        })
-      );
-    }
-  }
-
-  // MÉTODO PARA BUSCAR PRODUTOS EM DESTAQUE
-  getProdutosDestaque(): Observable<Produto[]> {
-    if (this.useMock) {
-      const destaque = this.produtosCache.filter(p => p.emDestaque);
-      return of(destaque);
-    } else {
-      // Se já tem cache e API está pronta, usa cache
-      if (this.produtosDestaqueCache.length > 0) {
-        return of(this.produtosDestaqueCache);
-      }
-      
-      return this.http.get<Produto[]>(`${this.apiUrl}/produtos/destaque`).pipe(
-        tap(produtos => {
-          this.produtosDestaqueCache = produtos;
         })
       );
     }

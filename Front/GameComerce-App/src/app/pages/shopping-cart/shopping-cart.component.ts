@@ -123,7 +123,7 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
     }
 
     if (this.cartItems.length === 0) {
-      this.showCartEmptyError();
+      this.mostrarToast('error', 'Seu carrinho está vazio. Adicione produtos antes de finalizar a compra.');
       return;
     }
     
@@ -140,15 +140,15 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
     const errors = this.getFormErrors();
   
     if (errors.emailRequired) {
-      this.toastMessageText = 'Por favor, informe seu email para continuar.';
+      this.mostrarToast('error', 'Por favor, informe seu email para continuar.');      
     } else if (errors.emailInvalid) {
-      this.toastMessageText = 'Verifique se o email está correto.';
+      this.mostrarToast('error', 'Verifique se o email está correto.');
     } else if (errors.telefoneRequired) {
-      this.toastMessageText = 'Por favor, informe seu telefone para continuar.';
+      this.mostrarToast('error', 'Por favor, informe seu telefone para continuar.');
     } else if (errors.telefoneInvalid) {
-      this.toastMessageText = 'Verifique se o telefone está correto. Formato: (11) 99999-9999';
+      this.mostrarToast('error', 'Verifique se o telefone está correto. Formato: (11) 99999-9999');
     } else {
-      this.toastMessageText = 'Por favor, corrija os erros no formulário antes de continuar.';
+      this.mostrarToast('error', 'Por favor, corrija os erros no formulário antes de continuar.');
     }
     
     this.toastType = 'error';
@@ -187,12 +187,6 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
     };
   }
 
-  private showCartEmptyError(): void {
-    this.toastType = 'error';
-    this.toastMessageText = 'Seu carrinho está vazio. Adicione produtos antes de finalizar a compra.';
-    this.toastMessage.show();
-  }
-
   // NOVO MÉTODO - Gerar pedido PIX
   gerarPedidoPix(): void {
     this.isLoading = true;
@@ -220,9 +214,7 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
         // Validar se o expirationTime é válido
         const expiracao = new Date(response.expirationTime).getTime();
         if (expiracao <= Date.now()) {
-          this.toastType = 'error';
-          this.toastMessageText = 'Erro no pagamento. Tente novamente.';
-          this.toastMessage.show();
+          this.mostrarToast('error', 'Erro no pagamento. Tente novamente.');
           return;
         }
         
@@ -240,10 +232,7 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.isLoading = false;
-        console.error('Erro ao gerar PIX:', error);
-        this.toastType = 'error';
-        this.toastMessageText = 'Erro ao processar pagamento. Tente novamente.';
-        this.toastMessage.show();
+        this.mostrarToast('error', 'Erro ao processar pagamento. Tente novamente');
       }
     });
   }
@@ -349,13 +338,9 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
   copiarCodigoPix(): void {
     if (this.pedidoResponse) {
       navigator.clipboard.writeText(this.pedidoResponse.pixCode).then(() => {
-        this.toastType = 'success';
-        this.toastMessageText = 'Código PIX copiado para a área de transferência!';
-        this.toastMessage.show();
+        this.mostrarToast('error', 'Código PIX copiado para a área de transferência!');
       }).catch(err => {
-        this.toastType = 'error';
-        this.toastMessageText = 'Erro ao copiar código. Tente novamente.';
-        this.toastMessage.show();
+        this.mostrarToast('error', 'Erro ao copiar código. Tente novamente.');
       });
     }
   }

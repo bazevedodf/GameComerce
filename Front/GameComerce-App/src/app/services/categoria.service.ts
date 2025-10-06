@@ -1,226 +1,118 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, tap, shareReplay, catchError, map } from 'rxjs';
 import { Categoria } from '../model/Categoria';
 import { Subcategoria } from '../model/Subcategoria';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '@environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoriaService {
 
-  private useMock = true; // Mude para false quando API estiver pronta
-  private categoriasCache: Categoria[] = [];
-  private categoriasDestaqueCache: Categoria[] = [];
-  private categoriasComDropdownCache: Categoria[] = [];
-  private apiUrl = 'https://sua-api.com/api';
+  private categoriasCache$?: Observable<Categoria[]>;
+  private apiUrl = environment.apiUrl+'Loja';
+  private imgUrl = environment.imgUrl;
 
-  constructor() {
-    this.carregarCategoriasIniciais();
-  }
+  constructor(private http: HttpClient) {}
 
-  private carregarCategoriasIniciais(): void {
-    if (this.useMock) {
-      this.categoriasCache = [
-        { 
-          id: 1,
-          name: "FORTNITE", 
-          hasDropdown: true,
-          slug: "fortnite",
-          descricao: "Explore, crie e brilhe no Roblox com estilo!",
-          imagem: "../../assets/img/categoria-fortnite.png",
-          icon: "assets/img/fortnite-ico.png",
-          subcategories: [
-            { name: "CONTAS FORTNITE", slug: "contas-fortnite" },
-            { name: "BUNDLES FORTNITE", slug: "bundles-fortnite" },
-          ]
-        },
-        { 
-          id: 2,
-          name: "FREE FIRE", 
-          hasDropdown: true,
-          slug: "free-fire",
-          descricao: "Ação rápida e intensa em batalhas épicas.",
-          imagem: "../../assets/img/categoria-free-fire.webp",
-          icon: "assets/img/freefire-ico.png",
-          subcategories: [
-            { name: "CONTAS FREEFIRE", slug: "contas-freefire" },
-          ]
-        },
-        { 
-          id: 3,
-          name: "VALORANT", 
-          hasDropdown: false,
-          slug: "valorant",
-          descricao: "Ação tática com estilo e precisão.",
-          imagem: "../../assets/img/categoria-valorant.jpg",
-          icon: "assets/img/valorant-ico.png"
-        },
-        { 
-          id: 4,
-          name: "LEAGUE OF LEGENDS", 
-          hasDropdown: false,
-          slug: "league-of-legends",
-          descricao: "Batalhas estratégicas em um mundo de fantasia.",
-          imagem: "../../assets/img/categoria-legue-of-legend.png",
-          icon: "assets/img/legue-of-legends-ico.png"
-        },
-        { 
-          id: 5,
-          name: "ROBLOX", 
-          hasDropdown: false,
-          slug: "roblox",
-          descricao: "Explore, crie e brilhe no Roblox com estilo!",
-          imagem: "../../assets/img/categoria-roblox.webp",
-          icon: "assets/img/robux-ico.png"
-        },
-        { 
-          id: 6,
-          name: "BRAWL STARS", 
-          hasDropdown: false,
-          slug: "brawl-stars",
-          descricao: "Lutas rápidas e divertidas com amigos.",
-          imagem: "../../assets/img/categoria-brawl-stars.webp",
-          icon: "assets/img/brawstars-ico.png"
-        },
-      ];
-
-      // Pré-carrega os caches
-      this.categoriasDestaqueCache = this.categoriasCache.filter(categoria => categoria.imagem);
-      this.categoriasComDropdownCache = this.categoriasCache.filter(categoria => categoria.hasDropdown);
+  //MÉTODO PRINCIPAL - Busca categorias UMA VEZ e compartilha
+  private carregarCategorias(): Observable<Categoria[]> {
+    if (!this.categoriasCache$) {
+      this.categoriasCache$ = this.http.get<Categoria[]>(`${this.apiUrl}/categorias`).pipe(
+        map(categorias => this.prefixarUrls(categorias)), //Prefixa URLs aqui
+        shareReplay(1),
+        catchError(error => {
+          this.categoriasCache$ = undefined;
+          throw error;
+        })
+      );
     }
+    return this.categoriasCache$;
   }
 
-  // Buscar todas as categorias
+  //MÉTODO PARA PREFIXAR URLs NAS IMAGENS E ÍCONES
+  private prefixarUrls(categorias: Categoria[]): Categoria[] {
+    return categorias.map(categoria => ({
+      ...categoria,
+      imagem: categoria.imagem ? this.prefixarUrl(categoria.imagem) : categoria.imagem,
+      icon: categoria.icon ? this.prefixarUrl(categoria.icon) : categoria.icon,
+    }));
+  }
+
+  //MÉTODO PARA PREFIXAR URL COMPLETA
+  private prefixarUrl(url: string): string {
+    if (url.startsWith('http')) {
+      return url;
+    }
+    const caminho = url.startsWith('/') ? url.substring(1) : url;
+
+    return `${this.imgUrl}/${caminho}`;
+  }
+
+  //Buscar todas as categorias (usa cache compartilhado)
   getCategorias(): Observable<Categoria[]> {
-    if (this.useMock) {
-      return of(this.categoriasCache);
-    } else {
-      // Se já tem cache, retorna do cache
-      if (this.categoriasCache.length > 0) {
-        return of(this.categoriasCache);
-      }
-      
-      // TODO: Implementar chamada API real
-      // return this.http.get<Categoria[]>(`${this.apiUrl}/categorias`).pipe(
-      //   tap(categorias => {
-      //     this.categoriasCache = categorias;
-      //     this.categoriasDestaqueCache = categorias.filter(cat => cat.imagem);
-      //     this.categoriasComDropdownCache = categorias.filter(cat => cat.hasDropdown);
-      //   })
-      // );
-      return of(this.categoriasCache); // Fallback temporário
-    }
+    return this.carregarCategorias();
   }
 
-  // Buscar categorias com dropdown (populares)
+  //Buscar categorias com dropdown (filtra do cache)
   getCategoriasComDropdown(): Observable<Categoria[]> {
-    if (this.useMock) {
-      return of(this.categoriasComDropdownCache);
-    } else {
-      // Se já tem cache, retorna do cache
-      if (this.categoriasComDropdownCache.length > 0) {
-        return of(this.categoriasComDropdownCache);
-      }
-      
-      // TODO: Implementar chamada API real
-      return of(this.categoriasComDropdownCache);
-    }
+    return this.carregarCategorias().pipe(
+      tap(categorias => {
+        console.log('Filtrando categorias com dropdown');
+      }),
+      map(categorias => categorias.filter(cat => cat.hasDropdown))
+    );
   }
 
-  // Buscar categorias em destaque (com imagem)
+  //Buscar categorias em destaque (filtra do cache)
   getCategoriasDestaque(): Observable<Categoria[]> {
-    if (this.useMock) {
-      return of(this.categoriasDestaqueCache);
-    } else {
-      // Se já tem cache, retorna do cache
-      if (this.categoriasDestaqueCache.length > 0) {
-        return of(this.categoriasDestaqueCache);
-      }
-      
-      // TODO: Implementar chamada API real
-      // return this.http.get<Categoria[]>(`${this.apiUrl}/categorias/destaque`).pipe(
-      //   tap(categorias => {
-      //     this.categoriasDestaqueCache = categorias;
-      //   })
-      // );
-      return of(this.categoriasDestaqueCache);
-    }
+    return this.carregarCategorias().pipe(
+      map(categorias => categorias.filter(cat => cat.imagem))
+    );
   }
 
-  // Buscar categoria por slug
+  //Buscar categoria por slug (filtra do cache)
   getCategoriaPorSlug(slug: string): Observable<Categoria | undefined> {
-    if (this.useMock) {
-      const categoria = this.categoriasCache.find(cat => cat.slug === slug);
-      return of(categoria);
-    } else {
-      // TODO: Implementar chamada API real
-      // return this.http.get<Categoria>(`${this.apiUrl}/categorias/${slug}`);
-      return of(this.categoriasCache.find(cat => cat.slug === slug));
-    }
+    return this.carregarCategorias().pipe(
+      map(categorias => categorias.find(cat => cat.slug === slug))
+    );
   }
 
-  // Buscar categoria por nome
+  //Buscar categoria por nome (filtra do cache)
   getCategoriaPorNome(name: string): Observable<Categoria | undefined> {
-    if (this.useMock) {
-      const categoria = this.categoriasCache.find(cat => 
+    return this.carregarCategorias().pipe(
+      map(categorias => categorias.find(cat => 
         cat.name.toLowerCase() === name.toLowerCase()
-      );
-      return of(categoria);
-    } else {
-      // TODO: Implementar chamada API real
-      return of(this.categoriasCache.find(cat => 
-        cat.name.toLowerCase() === name.toLowerCase()
-      ));
-    }
+      ))
+    );
   }
 
-  // Buscar categorias por termo de busca
+  //Buscar categorias por termo (filtra do cache)
   buscarCategorias(termo: string): Observable<Categoria[]> {
-    if (this.useMock) {
-      const categoriasFiltradas = this.categoriasCache.filter(categoria =>
+    return this.carregarCategorias().pipe(
+      map(categorias => categorias.filter(categoria =>
         categoria.name.toLowerCase().includes(termo.toLowerCase()) ||
         categoria.slug.toLowerCase().includes(termo.toLowerCase())
-      );
-      return of(categoriasFiltradas);
-    } else {
-      // TODO: Implementar chamada API real
-      // return this.http.get<Categoria[]>(`${this.apiUrl}/categorias/busca?q=${termo}`);
-      return of(this.categoriasCache.filter(categoria =>
-        categoria.name.toLowerCase().includes(termo.toLowerCase()) ||
-        categoria.slug.toLowerCase().includes(termo.toLowerCase())
-      ));
-    }
+      ))
+    );
   }
 
-  // Buscar subcategorias de uma categoria
+  //Buscar subcategorias (filtra do cache)
   getSubcategorias(slug: string): Observable<Subcategoria[]> {
-    if (this.useMock) {
-      const categoria = this.categoriasCache.find(cat => cat.slug === slug);
-      return of(categoria?.subcategories || []);
-    } else {
-      // TODO: Implementar chamada API real
-      // return this.http.get<Subcategoria[]>(`${this.apiUrl}/categorias/${slug}/subcategorias`);
-      const categoria = this.categoriasCache.find(cat => cat.slug === slug);
-      return of(categoria?.subcategories || []);
-    }
+    return this.getCategoriaPorSlug(slug).pipe(
+      map(categoria => categoria?.subcategories || [])
+    );
   }
 
-  // Método para atualizar quando API estiver pronta
-  setUseMock(usarMock: boolean): void {
-    this.useMock = usarMock;
-    if (!usarMock) {
-      // Limpa caches quando mudar para API real
-      this.categoriasCache = [];
-      this.categoriasDestaqueCache = [];
-      this.categoriasComDropdownCache = [];
-    }
-  }
-
-  // Método para forçar recarregamento (útil para admin)
+  // 🔄 Forçar recarregamento (útil quando dados mudam)
   recarregarCategorias(): void {
-    this.categoriasCache = [];
-    this.categoriasDestaqueCache = [];
-    this.categoriasComDropdownCache = [];
-    this.carregarCategoriasIniciais();
+    this.categoriasCache$ = undefined;
+    console.log('Cache de categorias resetado');
+  }
+
+  // 🎯 Verificar se já tem cache
+  temCache(): boolean {
+    return this.categoriasCache$ !== undefined;
   }
 }

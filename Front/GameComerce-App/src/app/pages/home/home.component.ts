@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Categoria } from 'src/app/model/Categoria';
 import { Produto } from 'src/app/model/Produto';
 import { CategoriaService } from 'src/app/services/categoria.service';
 import { ProdutoService } from 'src/app/services/Produto.service';
 import { SiteInfoService } from 'src/app/services/SiteInfo.service';
 import { SiteInfo } from 'src/app/model/siteInfo';
+import { environment } from '@environments/environment';
+import { ToastMessageComponent } from '@app/components/toast-message/toast-message.component';
 
 @Component({
   selector: 'app-home',
@@ -13,11 +15,16 @@ import { SiteInfo } from 'src/app/model/siteInfo';
 })
 export class HomeComponent implements OnInit {
 
+  @ViewChild('toastMessage') toastMessage!: ToastMessageComponent;
+  toastType: 'error' | 'success' | 'warning' | 'info' = 'error';
+  toastMessageText: string = '';
+
   isLoading = true; // Começa carregando
   loadingMessage = 'Carregando ofertas incríveis...';
   loadingSubMessage = '';
   showProgressBar = true;
   loadingProgress = 0;
+  imgCategoriaUlr = environment.imgUrl;
 
   produtosDestaque: Produto[] = [];
   categoriasDestaque: Categoria[] = [];
@@ -78,18 +85,6 @@ export class HomeComponent implements OnInit {
       }
     });
 
-    // Carrega produtos em destaque
-    this.produtoService.getProdutosDestaque().subscribe({
-      next: (produtos) => {
-        this.produtosDestaque = produtos;
-        this.atualizarProgresso(90);
-      },
-      error: (error) => {
-        console.error('Erro ao carregar produtos:', error);
-        this.atualizarProgresso(90);
-      }
-    });
-
     // Carrega categorias em destaque
     this.categoriaService.getCategoriasDestaque().subscribe({
       next: (categorias: Categoria[]) => {
@@ -99,14 +94,35 @@ export class HomeComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erro ao carregar categorias:', error);
+        this.mostrarToast('error', 'Erro ao carregar categorias. Tente novamente mais tarde.');
         this.atualizarProgresso(95);
         this.finalizarCarregamento();
       }
     });
+
+    // Carrega produtos em destaque
+    this.produtoService.getProdutos().subscribe({
+      next: (produtos) => {
+        this.produtosDestaque = produtos;
+        this.atualizarProgresso(90);
+      },
+      error: (error) => {
+        this.mostrarToast('error', 'Erro ao carregar produtos. Tente novamente mais tarde.');
+        console.error('Erro ao carregar produtos:', error);
+        this.atualizarProgresso(90);
+      }
+    });
+    
   }
 
   atualizarProgresso(progresso: number): void {
     this.loadingProgress = progresso;
+  }
+
+  private mostrarToast(type: 'error' | 'success' | 'warning' | 'info', message: string): void {
+    this.toastType = type;
+    this.toastMessageText = message;
+    this.toastMessage.show();
   }
 
   finalizarCarregamento(): void {
@@ -122,17 +138,8 @@ export class HomeComponent implements OnInit {
     }, 300);
   }
 
-  onBuscaRealizada(resultados: any): void {
-    console.log('Busca da home:', resultados);
-    // Aqui podemos navegar para página de resultados
-    if (resultados.termo || resultados.categoria) {
-      // this.router.navigate(['/produtos'], { queryParams: { busca: resultados.termo, categoria: resultados.categoria } });
-    }
-  }
-
   getCategoriaImagem(slug: string): string {
-    let imagem = 'assets/images/default-category.jpg';
-    
+    let imagem = '';    
     // Busca nas categorias já carregadas
     const categoria = this.categoriasDestaque.find(cat => cat.slug === slug);
     if (categoria) {

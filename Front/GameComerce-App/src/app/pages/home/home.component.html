@@ -7,6 +7,12 @@
     [showProgress]="showProgressBar"
     [progress]="loadingProgress">
   </app-loading-spinner>
+  <app-toast-message 
+    #toastMessage
+    [type]="toastType"
+    [message]="toastMessageText"
+    [seconds]="5">
+  </app-toast-message>
   <div class="container">
     <div class="row align-items-center min-vh-80 py-4">
       <div class="col-12 col-lg-6">

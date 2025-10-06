@@ -2,11 +2,13 @@ import {HttpClient} from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { SiteInfo } from '../model/siteInfo';
 import { Observable, of, tap } from 'rxjs';
+import { environment } from '@environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SiteInfoService {
 
   private cachedInfo?: SiteInfo;  
+  private apiUrl = environment.apiUrl+'Loja';
 
   constructor(private http: HttpClient) {}
 
@@ -28,12 +30,12 @@ export class SiteInfoService {
       whatsapp: '(11) 99999-9999',
     };
 
-    this.cachedInfo = mockInfo;
-    return of(mockInfo);
+    //this.cachedInfo = mockInfo;
+    //return of(mockInfo);
 
-    // return this.http.get<SiteInfo>('https://sua-api.com/site-info').pipe(
-    //   tap(data => this.cachedInfo = data)
-    // );
+    return this.http.get<SiteInfo>(this.apiUrl + '/siteinfo').pipe(
+      tap(data => this.cachedInfo = data)
+    );
   }
 
 }
