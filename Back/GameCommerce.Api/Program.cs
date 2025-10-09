@@ -5,7 +5,6 @@ using GameCommerce.Persistencia.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
-using Microsoft.Win32;
 using System.Text.Json.Serialization;
 
 
@@ -66,10 +65,14 @@ static void ConfigureServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<ISiteInfoPersist, SiteInfoPersist>();
     builder.Services.AddScoped<ITransacaoPagamentoPersist, TransacaoPagamentoPersist>();
 
+    // Registrar o HttpClient para GatewayService
+    builder.Services.AddHttpClient<IGatewayService, GatewayService>();
+
     // Registrar Services (Camada de Aplicação)
     builder.Services.AddScoped<ICategoriaService, CategoriaService>();
     builder.Services.AddScoped<IProdutoService, ProdutoService>();
     builder.Services.AddScoped<ICupomService, CupomService>();
+    builder.Services.AddScoped<IGatewayService, GatewayService>();
     builder.Services.AddScoped<IPedidoService, PedidoService>();
     builder.Services.AddScoped<ISiteInfoService, SiteInfoService>();
 
@@ -90,14 +93,26 @@ static void ConfigureServices(WebApplicationBuilder builder)
             Description = "API para área administrativa"
         });
 
-        // separar por namespace/controller
+        // Método SIMPLES e FUNCIONAL para separar as versões
         options.DocInclusionPredicate((docName, apiDesc) =>
         {
-            // V1: Controllers em namespace V1
-            // V2: Controllers em namespace V2
-            var assemblyName = apiDesc.ActionDescriptor.DisplayName;
-            return docName == "v1" ? assemblyName.Contains(".V1.")
-                                  : assemblyName.Contains(".V2.");
+            // Pega o caminho do endpoint
+            var routeTemplate = apiDesc.RelativePath;
+
+            if (routeTemplate == null) return false;
+
+            // V1: endpoints que começam com /api/v1/
+            // V2: endpoints que começam com /api/v2/
+            if (docName == "v1")
+            {
+                return routeTemplate.StartsWith("api/v1/");
+            }
+            else if (docName == "v2")
+            {
+                return routeTemplate.StartsWith("api/v2/");
+            }
+
+            return false;
         });
     });
 }
@@ -116,7 +131,16 @@ static void ConfigureAplication(WebApplication app)
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "V1 - Vendas");
+                options.SwaggerEndpoint("/swagger/v2/swagger.json", "V2 - Admin");
+
+                // Opcional: definir qual versão abrir por padrão
+                options.ConfigObject.DefaultModelsExpandDepth = -1;
+                options.ConfigObject.DisplayRequestDuration = true;
+            }
+        );
     }
 
     app.UseCors("AcessoTotal");

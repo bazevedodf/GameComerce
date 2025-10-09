@@ -25,7 +25,7 @@ namespace GameCommerce.Persistencia
 
         public async Task<Produto> GetByIdAsync(int id, bool includeCategoria = true)
         {
-            IQueryable<Produto> query = _context.Produtos.Where(p => p.Id == id && p.Ativo);
+            IQueryable<Produto> query = _context.Produtos.Where(p => p.Id == id);
 
             if (includeCategoria)
                 query = query.Include(p => p.Categoria);
@@ -57,17 +57,28 @@ namespace GameCommerce.Persistencia
 
         public async Task<Produto[]> BuscarAsync(string termo, bool includeCategoria = true)
         {
+            // Primeiro busca os produtos por nome e descrição no banco
             IQueryable<Produto> query = _context.Produtos
                 .Where(p => p.Ativo && (
                     p.Nome.Contains(termo) ||
-                    p.Descricao.Contains(termo) ||
-                    p.Tags.Any(tag => tag.Contains(termo))
+                    p.Descricao.Contains(termo)
                 ));
 
             if (includeCategoria)
                 query = query.Include(p => p.Categoria);
 
-            return await query.AsNoTracking().ToArrayAsync();
+            // Executa a query no banco
+            var produtos = await query.AsNoTracking().ToArrayAsync();
+
+            // Filtra por tags na memória (client evaluation)
+            var produtosComTags = produtos.Where(p =>
+                p.Tags?.Any(tag => tag.Contains(termo)) == true
+            ).ToArray();
+
+            // Combina os resultados
+            var todosProdutos = produtos.Union(produtosComTags).Distinct().ToArray();
+
+            return todosProdutos;
         }
 
         public async Task<Produto[]> GetByTagAsync(string tag, bool includeCategoria = true)
@@ -83,34 +94,17 @@ namespace GameCommerce.Persistencia
 
         public async Task<Produto[]> GetMaisVendidosPorCategoriaAsync(bool includeCategoria = true)
         {
-            var categorias = await _context.Categorias
-                .Where(c => c.Ativo)
-                .Select(c => c.Id)
-                .ToArrayAsync();
+            // Buscar TODOS os produtos ATIVOS e EM DESTAQUE
+            IQueryable<Produto> query = _context.Produtos
+                .Where(p => p.Ativo && p.EmDestaque)
+                .OrderByDescending(p => p.TotalAvaliacoes); // Ordena pelo total de avaliações (mais vendidos)
+                //.ThenByDescending(p => p.Avaliacao);       // Depois pela nota de avaliação
 
-            var produtosDestaquePorCategoria = new List<Produto>();
+            // Aplicar include se necessário
+            if (includeCategoria)
+                query = query.Include(p => p.Categoria);
 
-            foreach (var categoriaId in categorias)
-            {
-                // Buscar UM produto ATIVO e EM DESTAQUE da categoria
-                IQueryable<Produto> query = _context.Produtos
-                    .Where(p => p.Ativo && p.EmDestaque && p.CategoriaId == categoriaId)
-                    .OrderByDescending(p => p.Id); // Ordena por melhor avaliação
-                    //.ThenByDescending(p => p.Id);        // Depois por ID mais recente
-
-                // Aplicar include se necessário
-                if (includeCategoria)
-                    query = query.Include(p => p.Categoria);
-
-                var produto = await query.AsNoTracking().FirstOrDefaultAsync();
-
-                if (produto != null)
-                {
-                    produtosDestaquePorCategoria.Add(produto);
-                }
-            }
-
-            return produtosDestaquePorCategoria.ToArray();
+            return await query.AsNoTracking().ToArrayAsync();
         }
     }
 }

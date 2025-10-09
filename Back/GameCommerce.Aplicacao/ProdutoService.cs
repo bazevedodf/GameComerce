@@ -17,7 +17,7 @@ namespace GameCommerce.Aplicacao
             _mapper = mapper;
         }
 
-        public async Task<ProdutoDto> AddAsync(ProdutoDto model)
+        public async Task<ProdutoDto> AddAsync(ProdutoNewDto model)
         {
             try
             {

@@ -19,8 +19,7 @@ export class ProductListComponent {
   categorias: Categoria[] = [];
   
   // Filtros
-  categoriaSelecionada: string = '';
-  subcategoriaSelecionada: string = '';
+  categoriaSelecionada: string = 'mais-vendidos';
   termoBusca: string = '';
   ordenacao: string = 'relevancia';
   
@@ -31,6 +30,16 @@ export class ProductListComponent {
   
   // Estados
   isLoading: boolean = false;
+
+  categoriaMaisVendidos: Categoria = {
+    id: 0,
+    name: "MAIS VENDIDOS",
+    slug: "mais-vendidos", 
+    descricao: "Os produtos mais populares da loja",
+    imagem: "",
+    icon: "",
+    hasDropdown: false,
+  };
 
   constructor(
     private produtoService: ProdutoService,
@@ -46,34 +55,78 @@ export class ProductListComponent {
   }
   
   carregarDados(): void {
-    this.isLoading = true;
+    this.isLoading = false;
 
     let produtosCarregados = false;
     let categoriasCarregadas = false;
 
     const verificarSePodeAplicarFiltros = () => {
       if (produtosCarregados && categoriasCarregadas) {
-        this.aplicarFiltros();
+        this.aplicarFiltros(); //Garante que filtros são aplicados
         this.isLoading = false;
       }
     };
 
+    // VERIFICA SE PRECISA CARREGAR PRODUTOS ESPECÍFICOS OU TODOS
+    if (this.categoriaSelecionada === 'mais-vendidos') {
+      // Carrega produtos mais vendidos
+      this.produtoService.getProdutosDestaque().subscribe({
+        next: (produtos) => {
+          this.produtos = produtos;
+          produtosCarregados = true;
+          verificarSePodeAplicarFiltros();
+        },
+        error: (error) => {
+          console.error('Erro ao carregar produtos mais vendidos:', error);
+          produtosCarregados = true;
+          verificarSePodeAplicarFiltros();
+        }
+      });
+    } else if (this.categoriaSelecionada) {
+      // Carrega produtos por categoria
+      this.produtoService.getProdutosPorCategoria(this.categoriaSelecionada).subscribe({
+        next: (produtos) => {
+          this.produtos = produtos;
+          produtosCarregados = true;
+          verificarSePodeAplicarFiltros();
+        },
+        error: (error) => {
+          console.error('Erro ao carregar produtos por categoria:', error);
+          produtosCarregados = true;
+          verificarSePodeAplicarFiltros();
+        }
+      });
+    } else if (this.termoBusca) {
+      // Carrega produtos por busca
+      this.produtoService.buscarProdutos(this.termoBusca).subscribe({
+        next: (produtos) => {
+          this.produtos = produtos;
+          produtosCarregados = true;
+          verificarSePodeAplicarFiltros();
+        },
+        error: (error) => {
+          console.error('Erro ao buscar produtos:', error);
+          produtosCarregados = true;
+          verificarSePodeAplicarFiltros();
+        }
+      });
+    } else {
+      // Carrega todos os produtos
+      this.produtoService.getProdutos().subscribe({
+        next: (produtos) => {
+          this.produtos = produtos;
+          produtosCarregados = true;
+          verificarSePodeAplicarFiltros();
+        },
+        error: (error) => {
+          console.error('Erro ao carregar produtos:', error);
+          produtosCarregados = true;
+          verificarSePodeAplicarFiltros();
+        }
+      });
+    }
     
-    // Carrega produtos
-    this.produtoService.getProdutos().subscribe({
-      next: (produtos) => {
-        this.produtos = produtos;
-        produtosCarregados = true;
-        verificarSePodeAplicarFiltros();
-      },
-      error: (error) => {
-        console.error('Erro ao carregar produtos:', error);
-        produtosCarregados = true;
-        verificarSePodeAplicarFiltros();
-      }
-    });
-    
-    // Carrega categorias
+    // Carrega categorias (sempre necessário para filtros)
     this.categoriaService.getCategorias().subscribe({
       next: (categorias) => {
         this.categorias = categorias;
@@ -90,44 +143,26 @@ export class ProductListComponent {
 
   observarParametrosRota(): void {
     this.route.queryParams.subscribe(params => {
-      this.categoriaSelecionada = params['categoria'] || '';
-      this.subcategoriaSelecionada = params['subcategoria'] || '';
-      this.termoBusca = params['busca'] || '';
-      this.ordenacao = params['ordenacao'] || 'relevancia';
+      const novaCategoria = params['categoria'] || '';
+      const novoTermoBusca = params['busca'] || '';
       
-      if (this.produtos.length > 0) {
+      //SEMPRE recarrega quando os parâmetros principais mudam
+      if (novaCategoria !== this.categoriaSelecionada || novoTermoBusca !== this.termoBusca) {
+        this.categoriaSelecionada = novaCategoria;
+        this.termoBusca = novoTermoBusca;
+        this.ordenacao = params['ordenacao'] || 'relevancia';
+        this.carregarDados();
+      } else {
+        //Apenas atualiza ordenação se não mudou categoria/busca
+        this.ordenacao = params['ordenacao'] || 'relevancia';
         this.aplicarFiltros();
       }
     });
   }
 
-  // FILTROS E ORDENAÇÃO
+  // FILTROS E ORDENAÇÃO (mantido igual - agora funciona com dados reais)
   aplicarFiltros(): void {
     let produtosFiltrados = [...this.produtos];
-
-    // Filtro por categoria
-    if (this.categoriaSelecionada) {
-      produtosFiltrados = produtosFiltrados.filter(p => 
-        p.categoria.slug === this.categoriaSelecionada
-      );
-    }
-
-    // NOVO: Filtro por subcategoria
-    if (this.subcategoriaSelecionada) {
-      produtosFiltrados = produtosFiltrados.filter(p => 
-        p.categoria.name.toLowerCase() === this.subcategoriaSelecionada.toLowerCase()
-      );
-    }
-
-    // Filtro por busca
-    if (this.termoBusca) {
-      const termo = this.termoBusca.toLowerCase();
-      produtosFiltrados = produtosFiltrados.filter(p =>
-        p.nome.toLowerCase().includes(termo) ||
-        p.descricao.toLowerCase().includes(termo) ||
-        p.tags.some(tag => tag.toLowerCase().includes(termo))
-      );
-    }
 
     // Ordenação
     produtosFiltrados = this.ordenarProdutos(produtosFiltrados);
@@ -163,9 +198,18 @@ export class ProductListComponent {
     }
   }
 
+  // MÉTODO PARA RECARREGAR PRODUTOS (útil para quando dados mudam)
+  recarregarProdutos(): void {
+    this.produtoService.recarregarProdutos();
+    this.carregarDados();
+  }
+
   get textoCarregamento(): string {
     if (this.termoBusca) {
       return `Buscando por "${this.termoBusca}"...`;
+    }
+    if (this.categoriaSelecionada === 'mais-vendidos') {
+      return 'Carregando os produtos mais vendidos...';
     }
     if (this.categoriaSelecionada) {
       const categoria = this.categorias.find(cat => cat.slug === this.categoriaSelecionada);
@@ -201,7 +245,7 @@ export class ProductListComponent {
     this.cartService.adicionarItem(produto);
     
     // Feedback visual (podemos adicionar toast depois)
-    console.log(`✅ ${produto.nome} adicionado ao carrinho!`);
+    console.log(`${produto.nome} adicionado ao carrinho!`);
   }
 
   onProdutoAdicionado(produto: Produto): void {
@@ -214,18 +258,22 @@ export class ProductListComponent {
   }
 
   limparFiltros(): void {
-    this.categoriaSelecionada = '';
-    this.subcategoriaSelecionada = '';
+    this.categoriaSelecionada = 'mais-vendidos';
     this.termoBusca = '';
     this.ordenacao = 'relevancia';
-    this.atualizarURL();
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {}, 
+      queryParamsHandling: ''
+    });
+
     this.aplicarFiltros();
   }
 
   atualizarURL(): void {
     const queryParams: any = {};
     if (this.categoriaSelecionada) queryParams.categoria = this.categoriaSelecionada;
-    if (this.subcategoriaSelecionada) queryParams.subcategoria = this.subcategoriaSelecionada;
     if (this.termoBusca) queryParams.busca = this.termoBusca;
     if (this.ordenacao !== 'relevancia') queryParams.ordenacao = this.ordenacao;
 
@@ -238,7 +286,14 @@ export class ProductListComponent {
 
   onFiltroChange(): void {
     this.atualizarURL();
-    this.aplicarFiltros();
+    
+    //Se mudou a categoria ou busca, RECARREGA OS DADOS
+    if (this.categoriaSelecionada || this.termoBusca) {
+      this.carregarDados(); // Recarrega produtos específicos da categoria/busca
+    } else {
+      //Se não tem categoria nem busca, apenas aplica filtros nos produtos já carregados
+      this.aplicarFiltros();
+    }
   }
 
   // GETTERS ÚTEIS PARA TEMPLATE
@@ -268,10 +323,12 @@ export class ProductListComponent {
     if (this.isSearchResults) {
       return `🔍 Resultados para "${this.termoBusca}"`;
     }
+    if (this.categoriaSelecionada === 'mais-vendidos') {
+      return '🔥 Mais Vendidos';
+    }
     if (this.categoriaSelecionada) {
-      // ✅ CORREÇÃO: Busca nas categorias já carregadas
       const categoria = this.categorias.find(cat => cat.slug === this.categoriaSelecionada);
-      return `${categoria?.icon || '🎮'} ${categoria?.name || 'Categoria'}`;
+      return `🎮 Produtos ${categoria?.name || 'Categoria'}`;
     }
     return '🎮 Todos os Produtos';
   }

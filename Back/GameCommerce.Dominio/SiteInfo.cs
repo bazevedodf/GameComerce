@@ -13,6 +13,8 @@
         public string? Facebook { get; set; }
         public string? Whatsapp { get; set; }
         public string? YouTube { get; set; }
+        public string? ApiKey { get; set; }
+        public string? BaseUrl { get; set; }
         public bool Ativo { get; set; } = true;
 
         public IEnumerable<Cupom>? Cupons { get; set; }

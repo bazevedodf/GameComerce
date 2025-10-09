@@ -25,6 +25,24 @@ namespace GameCommerce.Api.Controllers.V1
         {
             try
             {
+                var produtos = await _produtoService.GetAllAsync();
+                if (produtos == null || !produtos.Any())
+                    return NoContent();
+
+                return Ok(produtos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro interno: {ex.Message}");
+            }
+        }
+
+        // GET: api/v1/produtos
+        [HttpGet("Destaques")]
+        public async Task<ActionResult<ProdutoDto[]>> GetDestaques()
+        {
+            try
+            {
                 var produtos = await _produtoService.GetMaisVendidosPorCategoriaAsync();
                 if (produtos == null || !produtos.Any())
                     return NoContent();

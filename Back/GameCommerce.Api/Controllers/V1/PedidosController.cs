@@ -1,305 +1,147 @@
-﻿using AutoMapper;
-using GameCommerce.Aplicacao.Dtos;
+﻿using GameCommerce.Aplicacao.Dtos;
 using GameCommerce.Aplicacao.Interfaces;
-using GameCommerce.Dominio;
-using GameCommerce.Dominio.Enuns;
-using GameCommerce.Persistencia.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
-namespace GameCommerce.Aplicacao
+namespace GameCommerce.Api.Controllers.V1
 {
-    public class PedidoService : IPedidoService
+    [ApiController]
+    [Route("api/v1/[controller]")]
+    public class PedidosController : ControllerBase
     {
-        private readonly IPedidoPersist _pedidoPersist;
-        private readonly ITransacaoPagamentoPersist _transacaoPagamentoPersist;
-        private readonly IMapper _mapper;
+        private readonly IPedidoService _pedidoService;
+        private readonly ISiteInfoService _siteInfoService;
+        private SiteInfoDto _siteInfoDto;
 
-        public PedidoService(
-            IPedidoPersist pedidoPersist,
-            ITransacaoPagamentoPersist transacaoPagamentoPersist,
-            IMapper mapper)
+        public PedidosController(IPedidoService pedidoService, ISiteInfoService siteInfoService)
         {
-            _pedidoPersist = pedidoPersist;
-            _transacaoPagamentoPersist = transacaoPagamentoPersist;
-            _mapper = mapper;
+            _pedidoService = pedidoService;
+            _siteInfoService = siteInfoService;
         }
 
-        // MÉTODOS EXISTENTES (mantidos)
-        public async Task<PedidoDto> AddAsync(PedidoDto model)
+        [HttpPost]
+        public async Task<ActionResult<PedidoResponseDto>> CriarPedidoPix(PedidoDto pedidoDto)
         {
             try
             {
-                var pedido = _mapper.Map<Pedido>(model);
-                pedido.DataCriacao = DateTime.UtcNow;
-                pedido.Status = StatusPedido.Pendente;
+                var dominio = Request.Host.Host;
+                _siteInfoDto = await _siteInfoService.GetByDominioAsync(dominio, apenasAtivos: true);
 
-                _pedidoPersist.Add(pedido);
-
-                if (await _pedidoPersist.SaveChangeAsync())
+                if (_siteInfoDto == null)
                 {
-                    var retorno = await _pedidoPersist.GetByIdAsync(pedido.Id, true, true);
-                    return _mapper.Map<PedidoDto>(retorno);
-                }
-                return null;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<PedidoDto> UpdateAsync(PedidoDto model)
-        {
-            try
-            {
-                var pedido = await _pedidoPersist.GetByIdAsync(model.Id, true, true);
-                if (pedido == null) return null;
-
-                _mapper.Map(model, pedido);
-                _pedidoPersist.Update(pedido);
-
-                if (await _pedidoPersist.SaveChangeAsync())
-                {
-                    var retorno = await _pedidoPersist.GetByIdAsync(pedido.Id, true, true);
-                    return _mapper.Map<PedidoDto>(retorno);
-                }
-                return null;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<bool> DeleteAsync(int id)
-        {
-            try
-            {
-                var pedido = await _pedidoPersist.GetByIdAsync(id);
-                if (pedido == null) return false;
-
-                pedido.Status = StatusPedido.Cancelado;
-                _pedidoPersist.Update(pedido);
-
-                return await _pedidoPersist.SaveChangeAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<PedidoDto> GetByIdAsync(int id)
-        {
-            try
-            {
-                var pedido = await _pedidoPersist.GetByIdAsync(id, true, true);
-                if (pedido == null) return null;
-
-                return _mapper.Map<PedidoDto>(pedido);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<PedidoDto[]> GetAllAsync()
-        {
-            try
-            {
-                var pedidos = await _pedidoPersist.GetAllAsync(true, true);
-                if (pedidos == null) return null;
-
-                return _mapper.Map<PedidoDto[]>(pedidos);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<PedidoDto> GetByTransactionIdAsync(string transactionId)
-        {
-            try
-            {
-                var pedido = await _pedidoPersist.GetByTransactionIdAsync(transactionId, true);
-                if (pedido == null) return null;
-
-                return _mapper.Map<PedidoDto>(pedido);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<PedidoDto[]> GetByStatusAsync(string status)
-        {
-            try
-            {
-                if (!Enum.TryParse<StatusPedido>(status, out var statusEnum))
-                    return null;
-
-                var pedidos = await _pedidoPersist.GetByStatusAsync(statusEnum, true);
-                if (pedidos == null) return null;
-
-                return _mapper.Map<PedidoDto[]>(pedidos);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        // MÉTODOS NOVOS/ALTERADOS para atender o PedidosController
-
-        public async Task<PedidoResponseDto> CriarPedidoComPixAsync(PedidoDto pedidoDto)
-        {
-            // Reutiliza o método existente ProcessarPagamentoPixAsync
-            return await ProcessarPagamentoPixAsync(pedidoDto);
-        }
-
-        public async Task<PedidoResponseDto> ConsultarStatusPedidoAsync(string transactionId)
-        {
-            // Reutiliza o método existente VerificarStatusPagamentoAsync
-            return await VerificarStatusPagamentoAsync(transactionId);
-        }
-
-        public async Task<bool> AtualizarStatusPedidoAsync(int id, string status)
-        {
-            try
-            {
-                var pedido = await _pedidoPersist.GetByIdAsync(id);
-                if (pedido == null) return false;
-
-                if (Enum.TryParse<StatusPedido>(status, out var statusEnum))
-                {
-                    pedido.Status = statusEnum;
-                    _pedidoPersist.Update(pedido);
-                    return await _pedidoPersist.SaveChangeAsync();
+                    return Unauthorized($"Site não encontrado para o domínio: {dominio}");
                 }
 
-                return false;
+                pedidoDto.SiteInfoId = _siteInfoDto.Id;
+                pedidoDto.SiteInfo = _siteInfoDto;
+
+                var resultado = await _pedidoService.ProcessarPagamentoPixAsync(pedidoDto);
+
+                return resultado == null
+                    ? BadRequest("Erro ao processar pedido")
+                    : Ok(resultado);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
-        public async Task ProcessarWebhookPixAsync(GatewayPixWebhookRequest webhookData)
+        [HttpGet("status/{transactionId}")]
+        public async Task<ActionResult<PedidoResponseDto>> ConsultarStatusPedido(string transactionId)
         {
             try
             {
-                if (webhookData?.Data == null) return;
+                var dominio = Request.Host.Host;
+                var siteInfo = await _siteInfoService.GetByDominioAsync(dominio, apenasAtivos: true);
 
-                var transactionId = webhookData.Data.TransactionId;
-                var pedido = await _pedidoPersist.GetByTransactionIdAsync(transactionId, true);
-
-                if (pedido == null) return;
-
-                // Atualizar status da transação
-                if (pedido.TransacaoPagamento != null)
+                if (siteInfo == null)
                 {
-                    pedido.TransacaoPagamento.GatewayStatus = webhookData.Data.Status;
-
-                    // Atualizar status do pedido baseado no status do gateway
-                    switch (webhookData.Data.Status.ToLower())
-                    {
-                        case "paid":
-                            pedido.Status = StatusPedido.Pago;
-                            break;
-                        case "expired":
-                            pedido.Status = StatusPedido.Expirado;
-                            break;
-                        case "cancelled":
-                            pedido.Status = StatusPedido.Cancelado;
-                            break;
-                    }
-
-                    _transacaoPagamentoPersist.Update(pedido.TransacaoPagamento);
-                    _pedidoPersist.Update(pedido);
-                    await _pedidoPersist.SaveChangeAsync();
+                    return Unauthorized($"Site não encontrado para o domínio: {dominio}");
                 }
+
+                var resultado = await _pedidoService.VerificarStatusPagamentoAsync(transactionId, false);
+
+
+                return resultado == null ? NotFound("Pedido não encontrado") : Ok(resultado);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Erro ao processar webhook: {ex.Message}");
+                return BadRequest(ex.Message);
             }
         }
 
-        // MÉTODOS EXISTENTES (mantidos com nomes originais para compatibilidade)
-        public async Task<PedidoResponseDto> ProcessarPagamentoPixAsync(PedidoDto pedidoDto)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PedidoDto>> BuscarPorId(int id)
         {
             try
             {
-                var pedido = _mapper.Map<Pedido>(pedidoDto);
-                pedido.DataCriacao = DateTime.UtcNow;
-                pedido.Status = StatusPedido.Pendente;
-                pedido.MeioPagamento = MeioPagamento.Pix;
+                var dominio = Request.Host.Host;
+                var siteInfo = await _siteInfoService.GetByDominioAsync(dominio, apenasAtivos: true);
 
-                _pedidoPersist.Add(pedido);
-
-                if (await _pedidoPersist.SaveChangeAsync())
+                if (siteInfo == null)
                 {
-                    // Gerar transaction ID único
-                    var transactionId = "TX" + DateTime.UtcNow.Ticks;
-
-                    // Criar transação PIX
-                    var transacao = new TransacaoPagamento
-                    {
-                        PedidoId = pedido.Id,
-                        TransactionId = transactionId,
-                        GatewayStatus = "pending",
-                        PixCode = "00020126860014br.gov.bcb.pix2564pix.ecomovi.com.br/qr/v3/at/71ad1e5e-a49d-4b1f-ab00-f82f78e17e8652040000053039865802BR5925KAPTPAY_TECNOLOGIA_DE_PA66009ARAPONGA562070503***630431BD",
-                        CustomerName = pedidoDto.TransacaoPagamento?.CustomerName,
-                        CustomerEmail = pedido.Email,
-                        CustomerPhone = pedido.Telefone,
-                        DataCriacao = DateTime.UtcNow
-                    };
-
-                    _transacaoPagamentoPersist.Add(transacao);
-                    await _transacaoPagamentoPersist.SaveChangeAsync();
-
-                    // Retornar o response específico para o frontend
-                    return new PedidoResponseDto
-                    {
-                        TransactionId = transactionId,
-                        QrCodeImage = "assets/img/qr-code-pix.png",
-                        PixCode = transacao.PixCode,
-                        ExpirationTime = DateTime.UtcNow.AddMinutes(30).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-                        Status = "pending"
-                    };
+                    return Unauthorized($"Site não encontrado para o domínio: {dominio}");
                 }
-                return null;
+
+                var pedido = await _pedidoService.GetByIdAsync(id);
+                if (pedido == null) return NotFound("Pedido não encontrado");
+
+                // Verificar se o pedido pertence ao site
+                if (pedido.SiteInfoId != siteInfo.Id)
+                {
+                    return Unauthorized("Pedido não pertence a este domínio");
+                }
+
+                return Ok(pedido);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
-        public async Task<PedidoResponseDto> VerificarStatusPagamentoAsync(string transactionId)
+        //[HttpPut("{id}/status")]
+        //public async Task<ActionResult<bool>> AtualizarStatus(int id, string status)
+        //{
+        //    try
+        //    {
+        //        var dominio = Request.Host.Host;
+        //        var siteInfo = await _siteInfoService.GetByDominioAsync(dominio, apenasAtivos: true);
+
+        //        if (siteInfo == null)
+        //        {
+        //            return Unauthorized($"Site não encontrado para o domínio: {dominio}");
+        //        }
+
+        //        var pedido = await _pedidoService.GetByIdAsync(id);
+        //        if (pedido == null) return NotFound("Pedido não encontrado");
+
+        //        if (pedido.SiteInfoId != siteInfo.Id)
+        //        {
+        //            return Unauthorized("Pedido não pertence a este domínio");
+        //        }
+
+        //        var resultado = await _pedidoService.AtualizarStatusPedidoAsync(id, status);
+        //        return !resultado ? BadRequest("Erro ao atualizar status") : Ok(resultado);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
+
+        [HttpPost("webhook/pix")]
+        public async Task<ActionResult> ProcessarWebhookPix(string webhookData)
         {
             try
             {
-                var pedido = await _pedidoPersist.GetByTransactionIdAsync(transactionId, true);
-                if (pedido == null) return null;
-
-                // TODO: Implementar verificação real com gateway
-                // Por enquanto, retornar o status atual
-                return new PedidoResponseDto
-                {
-                    TransactionId = transactionId,
-                    QrCodeImage = "assets/img/qr-code-pix.png",
-                    PixCode = pedido.TransacaoPagamento?.PixCode,
-                    ExpirationTime = pedido.TransacaoPagamento?.DataCriacao.AddMinutes(30).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-                    Status = pedido.TransacaoPagamento?.GatewayStatus ?? "pending"
-                };
+                // Webhook não valida domínio (vem do gateway)
+                //await _pedidoService.ProcessarWebhookPixAsync(webhookData);
+                return Ok();
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
     }

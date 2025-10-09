@@ -189,6 +189,10 @@ namespace GameCommerce.Persistencia.Migrations
                     b.Property<int>("Quantidade")
                         .HasColumnType("INTEGER");
 
+                    b.Property<decimal>("Subtotal")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PedidoId");
@@ -232,7 +236,6 @@ namespace GameCommerce.Persistencia.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
@@ -276,6 +279,12 @@ namespace GameCommerce.Persistencia.Migrations
                     b.Property<int?>("CategoriaId1")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime?>("DataAtualizacao")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DataCadastro")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Desconto")
                         .HasColumnType("INTEGER");
 
@@ -287,11 +296,11 @@ namespace GameCommerce.Persistencia.Migrations
                     b.Property<bool>("EmDestaque")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Entrega")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Entrega")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Imagem")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
@@ -312,7 +321,6 @@ namespace GameCommerce.Persistencia.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Tags")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("TotalAvaliacoes")
@@ -339,8 +347,14 @@ namespace GameCommerce.Persistencia.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ApiKey")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("Ativo")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("BaseUrl")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Cnpj")
                         .HasMaxLength(20)
@@ -465,32 +479,29 @@ namespace GameCommerce.Persistencia.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("City")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Country")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("BR");
 
                     b.Property<string>("CustomerDocument")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CustomerEmail")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CustomerName")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CustomerPhone")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
@@ -498,63 +509,54 @@ namespace GameCommerce.Persistencia.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<string>("GatewayCustomerId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("GatewayMessage")
-                        .IsRequired()
+                    b.Property<string>("Message")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("GatewayStatus")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("GatewaySuccess")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Neighborhood")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Number")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("Pix");
 
                     b.Property<int>("PedidoId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("PixCode")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PostbackUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("State")
-                        .IsRequired()
                         .HasMaxLength(2)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Status")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Street")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("Success")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("TransactionId")
                         .IsRequired()
@@ -562,7 +564,6 @@ namespace GameCommerce.Persistencia.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ZipCode")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("TEXT");
 

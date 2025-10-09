@@ -2,7 +2,6 @@
 using GameCommerce.Aplicacao.Dtos;
 using GameCommerce.Aplicacao.Interfaces;
 using GameCommerce.Dominio;
-using GameCommerce.Persistencia.Interfaces;
 
 namespace GameCommerce.Aplicacao
 {

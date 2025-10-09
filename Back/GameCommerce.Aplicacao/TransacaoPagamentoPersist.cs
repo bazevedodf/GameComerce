@@ -52,7 +52,7 @@ namespace GameCommerce.Persistencia
         {
             return await _context.TransacoesPagamento
                 .Include(t => t.Pedido)
-                .Where(t => t.GatewayStatus == status)
+                .Where(t => t.Status == status)
                 .AsNoTracking()
                 .ToArrayAsync();
         }

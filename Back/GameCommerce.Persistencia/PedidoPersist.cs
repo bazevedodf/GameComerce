@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using GameCommerce.Dominio;
+﻿using GameCommerce.Dominio;
 using GameCommerce.Persistencia.Interfaces;
-using GameCommerce.Dominio.Enuns;
+using Microsoft.EntityFrameworkCore;
 
 namespace GameCommerce.Persistencia
 {
@@ -19,7 +18,8 @@ namespace GameCommerce.Persistencia
             IQueryable<Pedido> query = _context.Pedidos.Where(p => p.Id == id);
 
             if (includeItens)
-                query = query.Include(p => p.Itens);
+                query = query.Include(p => p.Itens)
+                             .ThenInclude(x => x.Produto);
 
             if (includeCupom)
                 query = query.Include(p => p.Cupom);
@@ -42,7 +42,9 @@ namespace GameCommerce.Persistencia
 
         public async Task<Pedido> GetByTransactionIdAsync(string transactionId, bool includeItens = true)
         {
-            IQueryable<Pedido> query = _context.Pedidos.Where(p => p.TransacaoPagamento.TransactionId == transactionId);
+            IQueryable<Pedido> query = _context.Pedidos.Include(x => x.TransacaoPagamento)
+                                                       .Where(p => p.TransacaoPagamento.TransactionId == transactionId);
+
 
             if (includeItens)
                 query = query.Include(p => p.Itens);
@@ -50,9 +52,9 @@ namespace GameCommerce.Persistencia
             return await query.AsNoTracking().FirstOrDefaultAsync();
         }
 
-        public async Task<Pedido[]> GetByStatusAsync(StatusPedido status, bool includeItens = true)
+        public async Task<Pedido[]> GetByStatusAsync(string status, bool includeItens = true)
         {
-            IQueryable<Pedido> query = _context.Pedidos.Where(p => p.Status == status);
+            IQueryable<Pedido> query = _context.Pedidos.Where(p => p.Status.ToLower() == status.ToLower());
 
             if (includeItens)
                 query = query.Include(p => p.Itens);

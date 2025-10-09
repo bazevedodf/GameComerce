@@ -2,9 +2,9 @@
 {
     public enum StatusPedido
     {
-        Pendente,
-        Pago,
-        Expirado,
-        Cancelado
+        pending,
+        paid,
+        expired,
+        deleted
     }
 }

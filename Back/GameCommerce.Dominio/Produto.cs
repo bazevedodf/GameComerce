@@ -10,17 +10,19 @@ namespace GameCommerce.Dominio
         public decimal Preco { get; set; }
         public decimal PrecoOriginal { get; set; }
         public int Desconto { get; set; }
-        public string Imagem { get; set; }
+        public string? Imagem { get; set; }
         public int SiteInfoId { get; set; }
         public SiteInfo SiteInfo { get; set; }
         public int CategoriaId { get; set; }
-        public Categoria Categoria { get; set; }
+        public Categoria? Categoria { get; set; }
         public decimal Avaliacao { get; set; }
         public int TotalAvaliacoes { get; set; }
-        public List<string> Tags { get; set; }
+        public List<string>? Tags { get; set; }
         public bool Ativo { get; set; } = true;
         public bool EmDestaque { get; set; }
-        public TipoEntrega Entrega { get; set; }
+        public string? Entrega { get; set; }
+        public DateTime DataCadastro { get; set; }
+        public DateTime? DataAtualizacao { get; set; }
 
     }
 }

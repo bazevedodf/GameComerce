@@ -1,4 +1,4 @@
-import { Produto } from './Produto';
+import { ItemPedido } from './ItemPedido';
 
 export interface Pedido {
   email: string;
@@ -6,7 +6,7 @@ export interface Pedido {
   total: number;
   frete: number;
   meioPagamento: string,
-  itens: Produto[];
+  itens: ItemPedido[];
   cupom?: string;
   descontoAplicado?: number;
 }

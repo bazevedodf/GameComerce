@@ -292,7 +292,7 @@
           
           <!-- QR Code Dinâmico -->
           <div class="mb-4">
-            <img [src]="pedidoResponse?.qrCodeImage" 
+            <img [src]="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+pedidoResponse?.qrCodeImage" 
                 alt="QR Code PIX" 
                 class="img-fluid rounded"
                 style="max-width: 250px;">

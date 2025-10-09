@@ -9,5 +9,6 @@
         public Produto Produto { get; set; }
         public int Quantidade { get; set; }
         public decimal PrecoUnitario { get; set; } // Preço NA HORA DA COMPRA
+        public decimal Subtotal { get; set; }
     }
 }

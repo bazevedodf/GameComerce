@@ -39,7 +39,6 @@ namespace GameCommerce.Persistencia.Mapeamentos
                    .HasPrecision(10, 2);
 
             builder.Property(x => x.Status)
-                   .IsRequired()
                    .HasConversion<string>()
                    .HasMaxLength(20);
 

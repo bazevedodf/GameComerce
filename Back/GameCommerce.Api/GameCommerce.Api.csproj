@@ -29,7 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\V2\" />
     <Folder Include="Uploads\categorias\" />
     <Folder Include="Uploads\produtos\" />
   </ItemGroup>

@@ -9,7 +9,7 @@ namespace GameCommerce.Dominio
         public string Telefone { get; set; }
         public decimal Total { get; set; }
         public decimal Frete { get; set; }
-        public StatusPedido Status { get; set; }
+        public string? Status { get; set; } // "pending", "paid", "expired"
         public decimal? DescontoAplicado { get; set; }
         public DateTime DataCriacao { get; set; }
         public int? CupomId { get; set; }

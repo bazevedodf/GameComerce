@@ -14,6 +14,6 @@ namespace GameCommerce.Aplicacao.Interfaces
 
         // Métodos específicos para PIX - AGORA RETORNAM PedidoResponseDto
         Task<PedidoResponseDto> ProcessarPagamentoPixAsync(PedidoDto pedidoDto);
-        Task<PedidoResponseDto> VerificarStatusPagamentoAsync(string transactionId);
+        Task<PedidoResponseDto> VerificarStatusPagamentoAsync(string transactionId, bool includeItens = true);
     }
 }

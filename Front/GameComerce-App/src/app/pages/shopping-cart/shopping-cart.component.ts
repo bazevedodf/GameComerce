@@ -1,13 +1,14 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { CartItem } from '@app/model/CartIem';
 import { CupomService } from '@app/services/cupom.service';
 import { Subscription } from 'rxjs';
 import { ToastMessageComponent } from 'src/app/components/toast-message/toast-message.component';
 import { Cupom } from 'src/app/model/Cupom';
 import { Pedido } from 'src/app/model/Pedido';
 import { PedidoResponse } from 'src/app/model/PedidoResponse';
-import { CartItem, CartService } from 'src/app/services/cart.service';
+import { CartService } from 'src/app/services/cart.service';
 import { PedidoService } from 'src/app/services/pedido.service';
 
 declare var bootstrap: any;
@@ -196,15 +197,21 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
     this.email = this.checkoutForm.get('email')?.value;
 
     const pedido: Pedido = {
-      email: this.checkoutForm.get('email')?.value,  // ⬅️ PEGAR DO FORM
-      telefone: this.checkoutForm.get('telefone')?.value, // ⬅️ NOVO CAMPO
+      email: this.checkoutForm.get('email')?.value, 
+      telefone: this.checkoutForm.get('telefone')?.value,
       total: this.total,
       frete: this.frete,
       meioPagamento: 'PIX',
-      itens: this.cartItems.map(item => item.produto),
+      itens: this.cartItems.map(item => ({
+        produtoId: item.produto.id,
+        quantidade: item.quantidade,
+        precoUnitario: item.produto.preco
+      })),
       cupom: this.cupom || undefined,
-      descontoAplicado: this.descontoAplicado ? this.valorDesconto : undefined
+      descontoAplicado: this.descontoAplicado ? this.valorDesconto : undefined,
     };
+
+    console.log(pedido);    
 
     this.pedidoService.generatePixPayment(pedido).subscribe({
       next: (response: PedidoResponse) => {

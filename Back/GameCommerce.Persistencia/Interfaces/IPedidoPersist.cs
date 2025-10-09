@@ -8,6 +8,6 @@ namespace GameCommerce.Persistencia.Interfaces
         Task<Pedido> GetByIdAsync(int id, bool includeItens = true, bool includeCupom = true);
         Task<Pedido[]> GetAllAsync(bool includeItens = true, bool includeCupom = true);
         Task<Pedido> GetByTransactionIdAsync(string transactionId, bool includeItens = true);
-        Task<Pedido[]> GetByStatusAsync(StatusPedido status, bool includeItens = true);
+        Task<Pedido[]> GetByStatusAsync(string status, bool includeItens = true);
     }
 }

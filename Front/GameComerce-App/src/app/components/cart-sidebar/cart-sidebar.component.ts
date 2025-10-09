@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { CartItem } from '@app/model/CartIem';
 import { Produto } from 'src/app/model/Produto';
-import { CartItem, CartService } from 'src/app/services/cart.service';
+import { CartService } from 'src/app/services/cart.service';
 
 @Component({
   selector: 'app-cart-sidebar',

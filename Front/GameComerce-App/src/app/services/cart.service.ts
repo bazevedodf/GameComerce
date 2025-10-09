@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Produto } from '../model/Produto';
+import { Produto } from '@app/model/Produto';
 import { BehaviorSubject } from 'rxjs';
-
-export interface CartItem {
-  produto: Produto;
-  quantidade: number;
-}
+import { CartItem } from '@app/model/CartIem'
 
 @Injectable({
   providedIn: 'root'

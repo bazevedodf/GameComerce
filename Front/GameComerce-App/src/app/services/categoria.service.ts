@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, tap, shareReplay, catchError, map } from 'rxjs';
+import { Observable, of, tap, shareReplay, catchError, map, take } from 'rxjs';
 import { Categoria } from '../model/Categoria';
 import { Subcategoria } from '../model/Subcategoria';
 import { HttpClient } from '@angular/common/http';
@@ -20,9 +20,13 @@ export class CategoriaService {
   private carregarCategorias(): Observable<Categoria[]> {
     if (!this.categoriasCache$) {
       this.categoriasCache$ = this.http.get<Categoria[]>(`${this.apiUrl}/categorias`).pipe(
-        map(categorias => this.prefixarUrls(categorias)), //Prefixa URLs aqui
-        shareReplay(1),
+        map(categorias => {
+          console.log('Dados recebidos da API:', categorias);
+          return this.prefixarUrls(categorias);
+        }),
+        take(1), // AGORA O CACHE JÁ TEM AS URLs PREFIXADAS
         catchError(error => {
+          console.error('Erro ao carregar categorias:', error);
           this.categoriasCache$ = undefined;
           throw error;
         })
@@ -33,11 +37,14 @@ export class CategoriaService {
 
   //MÉTODO PARA PREFIXAR URLs NAS IMAGENS E ÍCONES
   private prefixarUrls(categorias: Categoria[]): Categoria[] {
-    return categorias.map(categoria => ({
+    console.log('Prefixando URLs para categorias:', categorias);
+    const categoriasComUrls = categorias.map(categoria => ({
       ...categoria,
       imagem: categoria.imagem ? this.prefixarUrl(categoria.imagem) : categoria.imagem,
       icon: categoria.icon ? this.prefixarUrl(categoria.icon) : categoria.icon,
     }));
+    console.log('Categorias após prefixar URLs:', categoriasComUrls);
+    return categoriasComUrls;
   }
 
   //MÉTODO PARA PREFIXAR URL COMPLETA

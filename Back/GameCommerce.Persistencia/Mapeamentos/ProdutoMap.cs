@@ -31,11 +31,18 @@ namespace GameCommerce.Persistencia.Mapeamentos
                    .HasPrecision(10, 2);
 
             builder.Property(x => x.Imagem)
-                   .IsRequired()
                    .HasMaxLength(500);
 
             builder.Property(x => x.Avaliacao)
                    .HasPrecision(3, 1);
+
+            builder.Property(x => x.Entrega)
+                   .HasMaxLength(50);
+
+            builder.Property(x => x.DataCadastro)
+                   .IsRequired();
+
+            builder.Property(x => x.DataAtualizacao);
 
             builder.Property(x => x.Ativo)
                    .IsRequired();

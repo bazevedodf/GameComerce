@@ -22,6 +22,10 @@ namespace GameCommerce.Persistencia.Mapeamentos
                    .IsRequired()
                    .HasPrecision(10, 2);
 
+            builder.Property(x => x.Subtotal)
+                  .IsRequired()
+                  .HasPrecision(10, 2);
+
             // Relacionamento com Pedido
             builder.HasOne(x => x.Pedido)
                    .WithMany(x => x.Itens)
