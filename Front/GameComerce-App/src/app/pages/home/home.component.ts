@@ -101,7 +101,7 @@ export class HomeComponent implements OnInit {
     });
 
     // Carrega produtos em destaque
-    this.produtoService.getProdutos().subscribe({
+    this.produtoService.getProdutosDestaque().subscribe({
       next: (produtos) => {
         this.produtosDestaque = produtos;
         this.atualizarProgresso(90);

@@ -96,9 +96,8 @@ namespace GameCommerce.Persistencia
         {
             // Buscar TODOS os produtos ATIVOS e EM DESTAQUE
             IQueryable<Produto> query = _context.Produtos
-                .Where(p => p.Ativo && p.EmDestaque)
-                .OrderByDescending(p => p.TotalAvaliacoes); // Ordena pelo total de avaliações (mais vendidos)
-                //.ThenByDescending(p => p.Avaliacao);       // Depois pela nota de avaliação
+                    .Where(p => p.Ativo && p.EmDestaque)
+                    .OrderByDescending(p => p.TotalAvaliacoes);
 
             // Aplicar include se necessário
             if (includeCategoria)

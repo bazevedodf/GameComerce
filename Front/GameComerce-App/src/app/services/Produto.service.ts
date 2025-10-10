@@ -23,7 +23,7 @@ export class ProdutoService {
     
   }
 
-  // MÉTODO PRINCIPAL - Busca produtos UMA VEZ e compartilha (igual CategoriaService)
+  // MÉTODO PRINCIPA
   private carregarProdutos(): Observable<Produto[]> {
     if (!this.produtosCache$) {
       this.produtosCache$ = this.http.get<Produto[]>(this.apiUrl).pipe(
