@@ -162,9 +162,6 @@ namespace GameCommerce.Persistencia.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Codigo")
-                        .IsUnique();
-
                     b.HasIndex("SiteInfoId");
 
                     b.ToTable("Cupons", (string)null);
@@ -200,6 +197,79 @@ namespace GameCommerce.Persistencia.Migrations
                     b.HasIndex("ProdutoId");
 
                     b.ToTable("ItensPedido", (string)null);
+                });
+
+            modelBuilder.Entity("GameCommerce.Dominio.MarketingTag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Identificador")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SiteInfoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TagId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Identificador")
+                        .IsUnique();
+
+                    b.HasIndex("SiteInfoId");
+
+                    b.ToTable("MarketingTags", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Ativo = true,
+                            Identificador = "g-roblox",
+                            Nome = "GTM Campanha Principal",
+                            SiteInfoId = 1,
+                            TagId = "GTM-ABCD123",
+                            Tipo = "google-tag-manager"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Ativo = true,
+                            Identificador = "f-roblox",
+                            Nome = "Facebook Pixel Principal",
+                            SiteInfoId = 1,
+                            TagId = "123456789012345",
+                            Tipo = "facebook-pixel"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Ativo = true,
+                            Identificador = "tk-roblox",
+                            Nome = "TikTok Campanha Natal",
+                            SiteInfoId = 1,
+                            TagId = "ABCDEF123456",
+                            Tipo = "tiktok-pixel"
+                        });
                 });
 
             modelBuilder.Entity("GameCommerce.Dominio.Pedido", b =>
@@ -276,9 +346,6 @@ namespace GameCommerce.Persistencia.Migrations
                     b.Property<int>("CategoriaId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CategoriaId1")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime?>("DataAtualizacao")
                         .HasColumnType("TEXT");
 
@@ -329,8 +396,6 @@ namespace GameCommerce.Persistencia.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoriaId");
-
-                    b.HasIndex("CategoriaId1");
 
                     b.HasIndex("SiteInfoId");
 
@@ -616,6 +681,17 @@ namespace GameCommerce.Persistencia.Migrations
                     b.Navigation("Produto");
                 });
 
+            modelBuilder.Entity("GameCommerce.Dominio.MarketingTag", b =>
+                {
+                    b.HasOne("GameCommerce.Dominio.SiteInfo", "SiteInfo")
+                        .WithMany("MarketingTags")
+                        .HasForeignKey("SiteInfoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SiteInfo");
+                });
+
             modelBuilder.Entity("GameCommerce.Dominio.Pedido", b =>
                 {
                     b.HasOne("GameCommerce.Dominio.Cupom", "Cupom")
@@ -637,14 +713,10 @@ namespace GameCommerce.Persistencia.Migrations
             modelBuilder.Entity("GameCommerce.Dominio.Produto", b =>
                 {
                     b.HasOne("GameCommerce.Dominio.Categoria", "Categoria")
-                        .WithMany()
+                        .WithMany("Produtos")
                         .HasForeignKey("CategoriaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("GameCommerce.Dominio.Categoria", null)
-                        .WithMany("Produtos")
-                        .HasForeignKey("CategoriaId1");
 
                     b.HasOne("GameCommerce.Dominio.SiteInfo", "SiteInfo")
                         .WithMany("Produtos")
@@ -703,6 +775,8 @@ namespace GameCommerce.Persistencia.Migrations
                     b.Navigation("Categorias");
 
                     b.Navigation("Cupons");
+
+                    b.Navigation("MarketingTags");
 
                     b.Navigation("Pedidos");
 

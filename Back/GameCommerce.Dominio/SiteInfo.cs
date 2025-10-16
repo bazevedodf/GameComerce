@@ -21,5 +21,6 @@
         public IEnumerable<Pedido>? Pedidos { get; set; }
         public IEnumerable<Produto>? Produtos { get; set; }
         public IEnumerable<Categoria>? Categorias { get; set; }
+        public IEnumerable<MarketingTag>? MarketingTags { get; set; }
     }
 }

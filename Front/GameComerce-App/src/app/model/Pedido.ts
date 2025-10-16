@@ -7,6 +7,6 @@ export interface Pedido {
   frete: number;
   meioPagamento: string,
   itens: ItemPedido[];
-  cupom?: string;
+  cupomId?: Number;
   descontoAplicado?: number;
 }

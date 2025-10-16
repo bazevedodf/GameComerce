@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using GameCommerce.Dominio;
+﻿using GameCommerce.Dominio;
 using GameCommerce.Persistencia.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace GameCommerce.Persistencia
 {
@@ -15,10 +15,8 @@ namespace GameCommerce.Persistencia
 
         public async Task<SiteInfo> GetByIdAsync(int id)
         {
-            return await _context.SiteInfos
-                .Where(s => s.Id == id && s.Ativo)
-                .AsNoTracking()
-                .FirstOrDefaultAsync();
+            return await _context.SiteInfos.Where(s => s.Id == id)
+                                           .AsNoTracking().FirstOrDefaultAsync();
         }
 
         public async Task<SiteInfo[]> GetAllAsync(bool apenasAtivos = true)
@@ -34,7 +32,8 @@ namespace GameCommerce.Persistencia
         public async Task<SiteInfo> GetByDominioAsync(string dominio, bool apenasAtivos = true)
         {
             IQueryable<SiteInfo> query = _context.SiteInfos
-                .Where(s => s.Dominio.ToLower() == dominio.ToLower());
+                .Where(s => s.Dominio.ToLower() == dominio.ToLower())
+                .Include(x => x.MarketingTags);
 
             if (apenasAtivos)
                 query = query.Where(s => s.Ativo);

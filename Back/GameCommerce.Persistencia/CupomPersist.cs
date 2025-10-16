@@ -15,16 +15,23 @@ namespace GameCommerce.Persistencia
 
         public async Task<Cupom> GetByIdAsync(int id)
         {
+            return await _context.Cupons.Where(c => c.Id == id)
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync();
+        }
+
+        public async Task<Cupom[]> GetBySiteIdAsync(int siteId)
+        {
             return await _context.Cupons
-                .Where(c => c.Id == id && c.Ativo)
+                .Where(c => c.SiteInfoId == siteId && c.Ativo && c.Valido)
                 .AsNoTracking()
-                .FirstOrDefaultAsync();
+                .ToArrayAsync();
         }
 
         public async Task<Cupom> GetByCodigoAsync(string codigo)
         {
             return await _context.Cupons
-                .Where(c => c.Codigo == codigo && c.Ativo)
+                .Where(c => c.Codigo == codigo)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
         }

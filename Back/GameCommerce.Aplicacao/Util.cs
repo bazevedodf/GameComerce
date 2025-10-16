@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace GameCommerce.Aplicacao
 {
@@ -10,7 +11,21 @@ namespace GameCommerce.Aplicacao
         {
             _configuration = configuration;
         }
-        
+
+        public string IdentificarSite(HttpRequest request)
+        {
+            var origem = request.Headers["Origin"].FirstOrDefault();
+            var referer = request.Headers["Referer"].FirstOrDefault();
+
+            if (!string.IsNullOrEmpty(origem))
+                return new Uri(origem).Host;
+
+            if (!string.IsNullOrEmpty(referer) && Uri.TryCreate(referer, UriKind.Absolute, out var uri))
+                return uri.Host;
+
+            return null;
+        }
+
         public string GerarCPFValido()
         {
             var random = new Random();

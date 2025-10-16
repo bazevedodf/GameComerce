@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using GameCommerce.Aplicacao.Interfaces;
+﻿using GameCommerce.Aplicacao;
 using GameCommerce.Aplicacao.Dtos;
+using GameCommerce.Aplicacao.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace GameCommerce.Api.Controllers.V1
 {
@@ -11,15 +13,21 @@ namespace GameCommerce.Api.Controllers.V1
         private readonly ISiteInfoService _siteInfoService;
         private readonly ICategoriaService _categoriaService;
         private readonly ICupomService _cupomService;
+        private readonly IConfiguration _configuration;
+
+        private Util _util;
 
         public LojaController(
             ISiteInfoService siteInfoService,
             ICategoriaService categoriaService,
+            IConfiguration configuration,
             ICupomService cupomService)
         {
             _siteInfoService = siteInfoService;
             _categoriaService = categoriaService;
+            _configuration = configuration;
             _cupomService = cupomService;
+            _util = new Util(_configuration);
         }
 
         // GET: api/v1/loja/siteinfo
@@ -28,8 +36,13 @@ namespace GameCommerce.Api.Controllers.V1
         {
             try
             {
-                // 1. Extrair domínio da requisição
-                var dominio = Request.Host.Host;
+                
+                var dominio = _util.IdentificarSite(Request);
+
+                if (string.IsNullOrEmpty(dominio))
+                {
+                    return Unauthorized("Acesso invalido e não autorizado");
+                }
 
                 // 2. Buscar no banco (apenas sites ativos)
                 var siteInfo = await _siteInfoService.GetByDominioAsync(dominio, apenasAtivos: true);
@@ -55,7 +68,23 @@ namespace GameCommerce.Api.Controllers.V1
         {
             try
             {
-                var categorias = await _categoriaService.GetAllAsync();
+                var dominio = _util.IdentificarSite(Request);
+
+                if (string.IsNullOrEmpty(dominio))
+                {
+                    return Unauthorized("Acesso invalido e não autorizado");
+                }
+
+                // 2. Buscar no banco (apenas sites ativos)
+                var siteInfo = await _siteInfoService.GetByDominioAsync(dominio, apenasAtivos: true);
+
+                // 3. Se não achou, retorna erro imediatamente
+                if (siteInfo == null)
+                {
+                    return NotFound($"Site não encontrado para o domínio: {dominio}");
+                }
+
+                var categorias = await _categoriaService.GetAllBySiteIdAsync(siteInfo.Id, true);
                 if (categorias == null || !categorias.Any())
                     return NoContent();
 
@@ -73,7 +102,23 @@ namespace GameCommerce.Api.Controllers.V1
         {
             try
             {
-                var categorias = await _categoriaService.GetAllAsync();
+                var dominio = _util.IdentificarSite(Request);
+
+                if (string.IsNullOrEmpty(dominio))
+                {
+                    return Unauthorized("Acesso invalido e não autorizado");
+                }
+
+                // 2. Buscar no banco (apenas sites ativos)
+                var siteInfo = await _siteInfoService.GetByDominioAsync(dominio, apenasAtivos: true);
+
+                // 3. Se não achou, retorna erro imediatamente
+                if (siteInfo == null)
+                {
+                    return NotFound($"Site não encontrado para o domínio: {dominio}");
+                }
+
+                var categorias = await _categoriaService.GetAllBySiteIdAsync(siteInfo.Id, true);
                 if (categorias == null || !categorias.Any())
                     return NoContent();
 
@@ -95,7 +140,7 @@ namespace GameCommerce.Api.Controllers.V1
 
         // GET: api/v1/loja/cupons/validar
         [HttpGet("cupons/validar")]
-        public async Task<ActionResult<CupomDto>> ValidarCupom([FromQuery] string codigo)
+        public async Task<ActionResult<CupomDto>> ValidarCupom(string codigo)
         {
             try
             {
@@ -110,5 +155,6 @@ namespace GameCommerce.Api.Controllers.V1
                 return StatusCode(500, $"Erro interno: {ex.Message}");
             }
         }
+
     }
 }

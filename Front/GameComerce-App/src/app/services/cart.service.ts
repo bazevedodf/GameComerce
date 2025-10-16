@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Produto } from '@app/model/Produto';
 import { BehaviorSubject } from 'rxjs';
 import { CartItem } from '@app/model/CartIem'
+import { MarketingTagService } from './marketingTag.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class CartService {
   private isOpenSubject = new BehaviorSubject<boolean>(false);
   public isOpen$ = this.isOpenSubject.asObservable();
 
-  constructor() {
+  constructor(private marketingTagService: MarketingTagService) {
     this.carregarCarrinho();
   }
 
@@ -47,18 +48,25 @@ export class CartService {
     
     let novosItens: CartItem[];
     
+    let quantidadeAdicionada = 1;
+  
     if (itemExistente) {
       novosItens = currentItems.map(item => 
         item.produto.id === produto.id 
           ? { ...item, quantidade: item.quantidade + 1 }
           : item
       );
+      quantidadeAdicionada = itemExistente.quantidade + 1;
     } else {
       novosItens = [...currentItems, { produto, quantidade: 1 }];
+      quantidadeAdicionada = 1;
     }
     
     this.cartItemsSubject.next(novosItens);
     this.salvarCarrinho();
+
+    //DISPARAR EVENTO DE MARKETING
+    this.marketingTagService.dispararAddToCart(produto, quantidadeAdicionada);
   }
 
   removerItem(produtoId: number): void {
@@ -99,7 +107,7 @@ export class CartService {
   }
 
   calcularFrete(): number {
-    return this.calcularSubtotal() > 100 ? 0 : 9.90;
+    return this.calcularSubtotal() > 100 ? 0 : 0;
   }
 
   calcularTotal(): number {

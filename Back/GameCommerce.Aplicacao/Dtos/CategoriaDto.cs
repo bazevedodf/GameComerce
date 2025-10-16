@@ -9,6 +9,7 @@
         public string? Imagem { get; set; }
         public string? Icon { get; set; }
         public bool Ativo { get; set; }
+        public int SiteInfoId { get; set; }
 
         public IEnumerable<SubcategoriaDto>? Subcategorias { get; set; }
     }

@@ -16,6 +16,8 @@ namespace GameCommerce.Persistencia
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<ItemPedido> ItensPedido { get; set; }
         public DbSet<SiteInfo> SiteInfos { get; set; }
+        public DbSet<MarketingTag> MarketingTags { get; set; }
+        
         public DbSet<TransacaoPagamento> TransacoesPagamento { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,6 +32,7 @@ namespace GameCommerce.Persistencia
             modelBuilder.ApplyConfiguration(new PedidoMap());
             modelBuilder.ApplyConfiguration(new ItemPedidoMap());
             modelBuilder.ApplyConfiguration(new SiteInfoMap());
+            modelBuilder.ApplyConfiguration(new MarketingTagMap());
             modelBuilder.ApplyConfiguration(new TransacaoPagamentoMap());
         }
     }

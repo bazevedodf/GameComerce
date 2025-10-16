@@ -52,7 +52,7 @@ export class CartSidebarComponent implements OnInit {
   // Cálculos locais
   calcularTotais(): void {
     this.subtotal = this.cartService.calcularSubtotal();
-    this.frete = this.cartService.calcularFrete();
+    //this.frete = this.cartService.calcularFrete();
     this.total = this.cartService.calcularTotal();
   }
 

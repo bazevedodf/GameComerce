@@ -21,9 +21,20 @@ namespace GameCommerce.Persistencia
                 .AsNoTracking()
                 .ToArrayAsync();
         }
+
         public async Task<Categoria[]> GetAllAsync(bool includeSubcategorias = true)
         {
             IQueryable<Categoria> query = _context.Categorias.Where(c => c.Ativo);
+
+            if (includeSubcategorias)
+                query = query.Include(c => c.Subcategorias.Where(s => s.Ativo));
+
+            return await query.AsNoTracking().ToArrayAsync();
+        }
+
+        public async Task<Categoria[]> GetAllBySiteIdAsync(int siteId, bool includeSubcategorias = true)
+        {
+            IQueryable<Categoria> query = _context.Categorias.Where(c => c.SiteInfoId == siteId && c.Ativo);
 
             if (includeSubcategorias)
                 query = query.Include(c => c.Subcategorias.Where(s => s.Ativo));

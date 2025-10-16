@@ -2,6 +2,7 @@
 using GameCommerce.Aplicacao.Dtos;
 using GameCommerce.Aplicacao.Interfaces;
 using GameCommerce.Dominio;
+using GameCommerce.Persistencia.Interfaces;
 
 namespace GameCommerce.Aplicacao
 {
@@ -59,15 +60,22 @@ namespace GameCommerce.Aplicacao
             }
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id, bool realDelete = false)
         {
             try
             {
                 var siteInfo = await _siteInfoPersist.GetByIdAsync(id);
                 if (siteInfo == null) return false;
 
-                siteInfo.Ativo = false;
-                _siteInfoPersist.Update(siteInfo);
+                if (realDelete)
+                {
+                    _siteInfoPersist.Delete(siteInfo);
+                }
+                else
+                {
+                    siteInfo.Ativo = false;
+                    _siteInfoPersist.Update(siteInfo);
+                }
 
                 return await _siteInfoPersist.SaveChangeAsync();
             }

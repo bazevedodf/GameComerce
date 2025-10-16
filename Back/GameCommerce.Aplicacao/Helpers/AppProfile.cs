@@ -16,6 +16,7 @@ namespace GameCommerce.Aplicacao.Helpers
             CreateMap<Produto, ProdutoDto>().ReverseMap();
             CreateMap<Produto, ProdutoNewDto>().ReverseMap();
             CreateMap<SiteInfo, SiteInfoDto>().ReverseMap();
+            CreateMap<MarketingTag, MarketingTagDto>().ReverseMap();
             CreateMap<Subcategoria, SubcategoriaDto>().ReverseMap();
         }
     }

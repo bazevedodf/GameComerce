@@ -1,5 +1,6 @@
 ﻿using GameCommerce.Aplicacao.Dtos;
 using GameCommerce.Aplicacao.Interfaces;
+using GameCommerce.Dominio;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameCommerce.Api.Controllers.V2
@@ -19,14 +20,67 @@ namespace GameCommerce.Api.Controllers.V2
         }
 
         /// <summary>
-        /// Obter todos os produtos (Admin - inclui inativos)
+        /// Duplicar produto (Admin)
         /// </summary>
-        [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] bool apenasAtivos = false)
+        [HttpPost("duplicar/{id}")]
+        public async Task<IActionResult> Duplicar(int id)
         {
             try
             {
-                var produtos = await _produtoService.GetAllAsync();
+                // Buscar o produto original
+                var produtoOriginal = await _produtoService.GetByIdAsync(id);
+                if (produtoOriginal == null)
+                    return NotFound($"Produto com ID {id} não encontrado");
+
+                // Criar uma cópia do produto
+                var produtoCopia = new ProdutoNewDto
+                {
+                    Nome = $"{produtoOriginal.Nome} - Cópia",
+                    Descricao = produtoOriginal.Descricao,
+                    Preco = produtoOriginal.Preco,
+                    PrecoOriginal = produtoOriginal.PrecoOriginal,
+                    Desconto = produtoOriginal.Desconto,
+                    Imagem = produtoOriginal.Imagem,
+                    Avaliacao = produtoOriginal.Avaliacao ?? 0,
+                    TotalAvaliacoes = 0, // Zera as avaliações na cópia
+                    Tags = produtoOriginal.Tags?.ToList(), // Cria nova lista
+                    Ativo = false, // Deixa inativo por padrão
+                    EmDestaque = false, // Remove do destaque
+                    Entrega = produtoOriginal.Entrega,
+                    DataCadastro = DateTime.Now,
+                    DataAtualizacao = DateTime.Now,
+                    CategoriaId = produtoOriginal.CategoriaId,
+                    SiteInfoId = produtoOriginal.SiteInfoId
+                };
+
+                // Salvar a cópia
+                var produtoDuplicado = await _produtoService.AddAsync(produtoCopia);
+                if (produtoDuplicado == null)
+                    return BadRequest("Erro ao duplicar produto");
+
+                return Ok(new
+                {
+                    mensagem = "Produto duplicado com sucesso",
+                    produtoOriginalId = id,
+                    produtoDuplicadoId = produtoDuplicado.Id,
+                    produto = produtoDuplicado
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro ao duplicar produto: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Obter todos os produtos (Admin - inclui inativos)
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> GetAll(int siteInfoId, bool apenasAtivos = false)
+        {
+            try
+            {
+                var produtos = await _produtoService.GetAllBySiteIdAsync(siteInfoId, apenasAtivos);
 
                 // Filtro adicional para admin
                 if (apenasAtivos)
@@ -80,59 +134,6 @@ namespace GameCommerce.Api.Controllers.V2
             catch (Exception ex)
             {
                 return StatusCode(500, $"Erro ao criar produto: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Duplicar produto (Admin)
-        /// </summary>
-        [HttpPost("duplicar/{id}")]
-        public async Task<IActionResult> Duplicar(int id)
-        {
-            try
-            {
-                // Buscar o produto original
-                var produtoOriginal = await _produtoService.GetByIdAsync(id);
-                if (produtoOriginal == null)
-                    return NotFound($"Produto com ID {id} não encontrado");
-
-                // Criar uma cópia do produto
-                var produtoCopia = new ProdutoNewDto
-                {
-                    Nome = $"{produtoOriginal.Nome} - Cópia",
-                    Descricao = produtoOriginal.Descricao,
-                    Preco = produtoOriginal.Preco,
-                    PrecoOriginal = produtoOriginal.PrecoOriginal,
-                    Desconto = produtoOriginal.Desconto,
-                    Imagem = produtoOriginal.Imagem,
-                    Avaliacao = produtoOriginal.Avaliacao ?? 0,
-                    TotalAvaliacoes = 0, // Zera as avaliações na cópia
-                    Tags = produtoOriginal.Tags?.ToList(), // Cria nova lista
-                    Ativo = false, // Deixa inativo por padrão
-                    EmDestaque = false, // Remove do destaque
-                    Entrega = produtoOriginal.Entrega,
-                    DataCadastro = DateTime.Now,
-                    DataAtualizacao = DateTime.Now,
-                    CategoriaId = produtoOriginal.CategoriaId,
-                    SiteInfoId = produtoOriginal.SiteInfoId
-                };
-
-                // Salvar a cópia
-                var produtoDuplicado = await _produtoService.AddAsync(produtoCopia);
-                if (produtoDuplicado == null)
-                    return BadRequest("Erro ao duplicar produto");
-
-                return Ok(new
-                {
-                    mensagem = "Produto duplicado com sucesso",
-                    produtoOriginalId = id,
-                    produtoDuplicadoId = produtoDuplicado.Id,
-                    produto = produtoDuplicado
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erro ao duplicar produto: {ex.Message}");
             }
         }
 
@@ -259,11 +260,11 @@ namespace GameCommerce.Api.Controllers.V2
         /// Obter produtos por categoria (Admin)
         /// </summary>
         [HttpGet("categoria/{categoriaSlug}")]
-        public async Task<IActionResult> GetByCategoria(string categoriaSlug)
+        public async Task<IActionResult> GetByCategoria(int siteInfoId, string categoriaSlug)
         {
             try
             {
-                var produtos = await _produtoService.GetByCategoriaAsync(categoriaSlug);
+                var produtos = await _produtoService.GetByCategoriaAsync(siteInfoId, categoriaSlug);
                 if (produtos == null || !produtos.Any())
                     return NotFound($"Nenhum produto encontrado para a categoria: {categoriaSlug}");
 
@@ -279,11 +280,11 @@ namespace GameCommerce.Api.Controllers.V2
         /// Obter produtos em destaque (Admin)
         /// </summary>
         [HttpGet("destaques")]
-        public async Task<IActionResult> GetDestaques()
+        public async Task<IActionResult> GetDestaques(int siteInfoId)
         {
             try
             {
-                var produtos = await _produtoService.GetDestaquesAsync();
+                var produtos = await _produtoService.GetDestaquesAsync(siteInfoId,true);
                 if (produtos == null || !produtos.Any())
                     return NotFound("Nenhum produto em destaque encontrado");
 
@@ -299,14 +300,14 @@ namespace GameCommerce.Api.Controllers.V2
         /// Buscar produtos por termo (Admin)
         /// </summary>
         [HttpGet("busca")]
-        public async Task<IActionResult> Buscar([FromQuery] string termo)
+        public async Task<IActionResult> Buscar(int siteInfoId, string termo)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(termo))
                     return BadRequest("Termo de busca não informado");
 
-                var produtos = await _produtoService.BuscarAsync(termo);
+                var produtos = await _produtoService.BuscarAsync(siteInfoId, termo);
                 if (produtos == null || !produtos.Any())
                     return NotFound($"Nenhum produto encontrado para: {termo}");
 
@@ -342,11 +343,11 @@ namespace GameCommerce.Api.Controllers.V2
         /// Obter produtos mais vendidos (Admin)
         /// </summary>
         [HttpGet("mais-vendidos")]
-        public async Task<IActionResult> GetMaisVendidos()
+        public async Task<IActionResult> GetMaisVendidos(int siteInfoId)
         {
             try
             {
-                var produtos = await _produtoService.GetMaisVendidosPorCategoriaAsync();
+                var produtos = await _produtoService.GetMaisVendidosPorCategoriaAsync(siteInfoId);
                 if (produtos == null || !produtos.Any())
                     return NotFound("Nenhum produto mais vendido encontrado");
 

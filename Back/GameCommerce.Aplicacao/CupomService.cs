@@ -78,6 +78,7 @@ namespace GameCommerce.Aplicacao
             }
         }
 
+        
         public async Task<CupomDto> GetByIdAsync(int id)
         {
             try
@@ -108,11 +109,11 @@ namespace GameCommerce.Aplicacao
             }
         }
 
-        public async Task<CupomDto[]> GetAllAsync()
+        public async Task<CupomDto[]> GetAllAsync(bool apenasAtivos = true)
         {
             try
             {
-                var cupons = await _cupomPersist.GetAllAsync();
+                var cupons = await _cupomPersist.GetAllAsync(apenasAtivos);
                 if (cupons == null) return null;
 
                 return _mapper.Map<CupomDto[]>(cupons);
@@ -144,6 +145,57 @@ namespace GameCommerce.Aplicacao
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<CupomDto[]> GetBySiteIdAsync(int siteId)
+        {
+            try
+            {
+                // Este método será implementado depois na persistência
+                var cupons = await _cupomPersist.GetBySiteIdAsync(siteId);
+                if (cupons == null) return null;
+
+                return _mapper.Map<CupomDto[]>(cupons);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<int> ClonarCuponsAsync(int siteOrigemId, int siteDestinoId)
+        {
+            try
+            {
+                var cuponsOriginais = await GetBySiteIdAsync(siteOrigemId);
+                if (cuponsOriginais == null || !cuponsOriginais.Any())
+                    return 0;
+
+                var cuponsClonados = 0;
+
+                foreach (var cupomOriginal in cuponsOriginais)
+                {
+                    var novoCupom = new CupomDto
+                    {
+                        Codigo = cupomOriginal.Codigo,
+                        Valido = true,
+                        ValorDesconto = cupomOriginal.ValorDesconto,
+                        TipoDesconto = cupomOriginal.TipoDesconto,
+                        MensagemErro = cupomOriginal.MensagemErro,
+                        SiteInfoId = siteDestinoId
+                    };
+
+                    var cupomClonado = await AddAsync(novoCupom);
+                    if (cupomClonado != null)
+                        cuponsClonados++;
+                }
+
+                return cuponsClonados;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao clonar cupons: {ex.Message}");
             }
         }
     }

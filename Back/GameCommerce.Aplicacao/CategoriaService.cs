@@ -78,6 +78,21 @@ namespace GameCommerce.Aplicacao
             }
         }
 
+        public async Task<CategoriaDto[]> BuscarAsync(string termo)
+        {
+            try
+            {
+                var categorias = await _categoriaPersist.BuscarAsync(termo);
+                if (categorias == null) return null;
+
+                return _mapper.Map<CategoriaDto[]>(categorias);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<CategoriaDto> GetByIdAsync(int id, bool includeSubcategorias = true)
         {
             try
@@ -123,11 +138,11 @@ namespace GameCommerce.Aplicacao
             }
         }
 
-        public async Task<CategoriaDto[]> BuscarAsync(string termo)
+        public async Task<CategoriaDto[]> GetAllBySiteIdAsync(int siteId, bool includeSubcategorias = true)
         {
             try
             {
-                var categorias = await _categoriaPersist.BuscarAsync(termo);
+                var categorias = await _categoriaPersist.GetAllBySiteIdAsync(siteId, includeSubcategorias); // Include subcategorias
                 if (categorias == null) return null;
 
                 return _mapper.Map<CategoriaDto[]>(categorias);
@@ -135,6 +150,51 @@ namespace GameCommerce.Aplicacao
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<int> ClonarCategoriasAsync(int siteOrigemId, int siteDestinoId)
+        {
+            try
+            {
+                // Usando o método existente GetAllBySiteIdAsync
+                var categoriasOriginais = await GetAllBySiteIdAsync(siteOrigemId, true);
+                if (categoriasOriginais == null || !categoriasOriginais.Any())
+                    return 0;
+
+                var categoriasClonadas = 0;
+
+                foreach (var categoriaOriginal in categoriasOriginais)
+                {
+                    var novaCategoria = new CategoriaDto
+                    {
+                        Name = categoriaOriginal.Name,
+                        Slug = categoriaOriginal.Slug,
+                        Descricao = categoriaOriginal.Descricao,
+                        Imagem = categoriaOriginal.Imagem,
+                        Icon = categoriaOriginal.Icon,
+                        Ativo = true,
+                        SiteInfoId = siteDestinoId,
+                        Subcategorias = categoriaOriginal.Subcategorias?
+                            .Where(s => s.Ativo)
+                            .Select(s => new SubcategoriaDto
+                            {
+                                Name = s.Name,
+                                Slug = s.Slug,
+                                Ativo = true
+                            }).ToList()
+                    };
+
+                    var categoriaClonada = await AddAsync(novaCategoria);
+                    if (categoriaClonada != null)
+                        categoriasClonadas++;
+                }
+
+                return categoriasClonadas;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao clonar categorias: {ex.Message}");
             }
         }
 

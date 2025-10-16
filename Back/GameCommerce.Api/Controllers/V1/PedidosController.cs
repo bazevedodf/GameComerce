@@ -1,6 +1,8 @@
-﻿using GameCommerce.Aplicacao.Dtos;
+﻿using GameCommerce.Aplicacao;
+using GameCommerce.Aplicacao.Dtos;
 using GameCommerce.Aplicacao.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace GameCommerce.Api.Controllers.V1
 {
@@ -10,12 +12,17 @@ namespace GameCommerce.Api.Controllers.V1
     {
         private readonly IPedidoService _pedidoService;
         private readonly ISiteInfoService _siteInfoService;
+        private readonly IConfiguration _configuration;
         private SiteInfoDto _siteInfoDto;
 
-        public PedidosController(IPedidoService pedidoService, ISiteInfoService siteInfoService)
+        private Util _util;
+
+        public PedidosController(IPedidoService pedidoService, ISiteInfoService siteInfoService, IConfiguration configuration)
         {
             _pedidoService = pedidoService;
             _siteInfoService = siteInfoService;
+            _configuration = configuration;
+            _util = new Util(_configuration);
         }
 
         [HttpPost]
@@ -23,7 +30,13 @@ namespace GameCommerce.Api.Controllers.V1
         {
             try
             {
-                var dominio = Request.Host.Host;
+                var dominio = _util.IdentificarSite(Request);
+
+                if (string.IsNullOrEmpty(dominio))
+                {
+                    return Unauthorized("Acesso invalido e não autorizado");
+                }
+
                 _siteInfoDto = await _siteInfoService.GetByDominioAsync(dominio, apenasAtivos: true);
 
                 if (_siteInfoDto == null)
@@ -51,10 +64,16 @@ namespace GameCommerce.Api.Controllers.V1
         {
             try
             {
-                var dominio = Request.Host.Host;
-                var siteInfo = await _siteInfoService.GetByDominioAsync(dominio, apenasAtivos: true);
+                var dominio = _util.IdentificarSite(Request);
 
-                if (siteInfo == null)
+                if (string.IsNullOrEmpty(dominio))
+                {
+                    return Unauthorized("Acesso invalido e não autorizado");
+                }
+
+                _siteInfoDto = await _siteInfoService.GetByDominioAsync(dominio, apenasAtivos: true);
+
+                if (_siteInfoDto == null)
                 {
                     return Unauthorized($"Site não encontrado para o domínio: {dominio}");
                 }

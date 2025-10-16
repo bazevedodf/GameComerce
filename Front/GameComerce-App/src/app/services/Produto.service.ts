@@ -93,13 +93,13 @@ getProdutosPorCategoria(categoriaSlug: string): Observable<Produto[]> {
   return this.http.get<Produto[]>(`${this.apiUrl}/categoria/${categoriaSlug}`).pipe(
     map(produtos => {
       if (!produtos) {
-        console.warn(`Nenhum produto encontrado para categoria: ${categoriaSlug}`);
+        //console.warn(`Nenhum produto encontrado para categoria: ${categoriaSlug}`);
         return [];
       }
       return this.prefixarUrlsProdutos(produtos);
     }),
     catchError(error => {
-      console.error(`Erro ao buscar produtos por categoria ${categoriaSlug}:`, error);
+      //console.error(`Erro ao buscar produtos por categoria ${categoriaSlug}:`, error);
       return of([]); // Retorna array vazio em caso de erro
     })
   );
@@ -110,13 +110,13 @@ buscarProdutos(termo: string): Observable<Produto[]> {
   return this.http.get<Produto[]>(`${this.apiUrl}/busca?termo=${termo}`).pipe(
     map(produtos => {
       if (!produtos) {
-        console.warn(`Nenhum produto encontrado para busca: ${termo}`);
+        //console.warn(`Nenhum produto encontrado para busca: ${termo}`);
         return [];
       }
       return this.prefixarUrlsProdutos(produtos);
     }),
     catchError(error => {
-      console.error(`Erro ao buscar produtos por termo ${termo}:`, error);
+      //console.error(`Erro ao buscar produtos por termo ${termo}:`, error);
       return of([]); // Retorna array vazio em caso de erro
     })
   );
@@ -126,7 +126,6 @@ buscarProdutos(termo: string): Observable<Produto[]> {
   recarregarProdutos(): void {
     this.produtosCache$ = undefined;
     this.produtosDestaqueCache$ = undefined;
-    console.log('Cache de produtos resetado');
   }
 
 }

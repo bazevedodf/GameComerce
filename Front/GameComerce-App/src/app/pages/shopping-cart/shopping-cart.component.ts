@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CartItem } from '@app/model/CartIem';
 import { CupomService } from '@app/services/cupom.service';
+import { MarketingTagService } from '@app/services/marketingTag.service';
 import { Subscription } from 'rxjs';
 import { ToastMessageComponent } from 'src/app/components/toast-message/toast-message.component';
 import { Cupom } from 'src/app/model/Cupom';
@@ -60,6 +61,7 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
     private cartService: CartService,
     private pedidoService: PedidoService,
     private cupomService: CupomService,
+    private marketingTagService: MarketingTagService,
     private router: Router,
     private fb: FormBuilder
   ) {}
@@ -90,7 +92,7 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
 
   calcularTotais(): void {
     this.subtotal = this.cartService.calcularSubtotal();
-    this.frete = this.cartService.calcularFrete();
+    //this.frete = this.cartService.calcularFrete();
     
     // Aplicar desconto se houver
     if (this.descontoAplicado) {
@@ -127,6 +129,14 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
       this.mostrarToast('error', 'Seu carrinho está vazio. Adicione produtos antes de finalizar a compra.');
       return;
     }
+
+    // DISPARAR INITIATECHECKOUT
+    this.marketingTagService.dispararInitiateCheckout({
+      itens: this.cartItems,
+      total: this.total,
+      subtotal: this.subtotal,
+      frete: this.frete
+    });
     
     this.gerarPedidoPix();
   }
@@ -188,12 +198,13 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
     };
   }
 
-  // NOVO MÉTODO - Gerar pedido PIX
+  //Gerar pedido PIX
   gerarPedidoPix(): void {
     this.isLoading = true;
     this.loadingMessage = 'Processando pagamento...';
     this.loadingSubMessage = 'Gerando código PIX';
 
+    debugger;
     this.email = this.checkoutForm.get('email')?.value;
 
     const pedido: Pedido = {
@@ -207,7 +218,7 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
         quantidade: item.quantidade,
         precoUnitario: item.produto.preco
       })),
-      cupom: this.cupom || undefined,
+      cupomId: this.cupomAplicado?.id || undefined,
       descontoAplicado: this.descontoAplicado ? this.valorDesconto : undefined,
     };
 
@@ -244,7 +255,7 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
     });
   }
 
-  // NOVO MÉTODO - Temporizador
+  //Temporizador
   iniciarTemporizador(expirationTime: string): void {
     const expiracao = new Date(expirationTime).getTime();
     const agora = Date.now();
@@ -284,7 +295,7 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
     }
   }
 
-  // NOVO MÉTODO - Polling
+  //Polling
   iniciarPolling(transactionId: string): void {
     this.pararPolling();
     
@@ -294,6 +305,10 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
         
         //FLUXO DE MENSAGENS CONFORME STATUS
         if (response.status === 'paid') {
+          
+          // PAGO - DISPARAR EVENTO PURCHASE
+          this.dispararEventoPurchase(response);
+
           // PAGO - para polling e limpa carrinho
           this.pararPolling();
           this.pararTemporizador();
@@ -341,7 +356,7 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ATUALIZAR método copiarCodigoPix():
+  //método copiarCodigoPix():
   copiarCodigoPix(): void {
     if (this.pedidoResponse) {
       navigator.clipboard.writeText(this.pedidoResponse.pixCode).then(() => {
@@ -349,6 +364,26 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
       }).catch(err => {
         this.mostrarToast('error', 'Erro ao copiar código. Tente novamente.');
       });
+    }
+  }
+
+  private dispararEventoPurchase(pedidoResponse: PedidoResponse): void {
+    try {
+      console.log('💰 Disparando evento Purchase - Pedido Pago:', pedidoResponse.transactionId);
+      
+      // Precisamos dos dados do pedido para o evento
+      const pedidoData = {
+        id: pedidoResponse.transactionId,
+        total: this.total, // Usa o total do componente
+        frete: this.frete, // Usa o frete do componente  
+        itens: this.cartItems // Usa os itens do carrinho
+      };
+      
+      // Disparar evento Purchase
+      this.marketingTagService.dispararPurchase(pedidoData);
+      
+    } catch (error) {
+      console.error('❌ Erro ao disparar Purchase:', error);
     }
   }
 
@@ -411,7 +446,7 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
     this.cupomService.validarCupom(this.cupom.toUpperCase()).subscribe({
       next: (cupom: Cupom) => {
         this.isValidandoCupom = false;
-        
+        debugger;
         if (cupom.valido) {
           this.aplicarDesconto(cupom);
           this.mostrarToast('success', `Cupom ${cupom.codigo} aplicado! Desconto de R$ ${this.valorDesconto.toFixed(2)}`);
@@ -433,8 +468,8 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
 
   private aplicarDesconto(cupom: Cupom): void {
     this.cupomAplicado = cupom;
-
-    if (cupom.tipoDesconto === 'percentual') {
+    debugger;
+    if (cupom.tipoDesconto.toLocaleLowerCase() === 'percentual') {
       this.valorDesconto = this.subtotal * (cupom.valorDesconto! / 100);
     } else {
       this.valorDesconto = cupom.valorDesconto!;

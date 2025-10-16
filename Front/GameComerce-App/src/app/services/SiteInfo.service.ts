@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { SiteInfo } from '../model/siteInfo';
 import { Observable, of, tap } from 'rxjs';
 import { environment } from '@environments/environment';
+import { ActivatedRoute } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class SiteInfoService {
@@ -10,28 +11,14 @@ export class SiteInfoService {
   private cachedInfo?: SiteInfo;  
   private apiUrl = environment.apiUrl+'Loja';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+              private route: ActivatedRoute
+  ) {}
 
   getSiteInfo(): Observable<SiteInfo> {
     if (this.cachedInfo) {
       return of(this.cachedInfo);
     }
-
-    // Dados fictícios para testes
-    const mockInfo: SiteInfo = {
-      nome: 'Game Commerce',
-      dominio: 'gamecomerce.com.br',
-      logoUrl: 'https://ggbundles.com/assets/logo-site-BRumCtgc.png',
-      cnpj: '12.345.678/0001-99',
-      address: 'Rua dos Games, 123 - São Paulo, SP',
-      email: 'contato@gamecomerce.com.br',
-      instagram: 'https://instagram.com/gamecomerce',
-      facebook: 'https://facebook.com/gamecomerce',
-      whatsapp: '(11) 99999-9999',
-    };
-
-    //this.cachedInfo = mockInfo;
-    //return of(mockInfo);
 
     return this.http.get<SiteInfo>(this.apiUrl + '/siteinfo').pipe(
       tap(data => this.cachedInfo = data)

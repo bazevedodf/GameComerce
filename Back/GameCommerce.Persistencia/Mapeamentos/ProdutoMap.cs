@@ -49,7 +49,7 @@ namespace GameCommerce.Persistencia.Mapeamentos
 
             // Relacionamento N:1 com Categoria
             builder.HasOne(x => x.Categoria)
-                   .WithMany()
+                   .WithMany(x => x.Produtos)
                    .HasForeignKey(x => x.CategoriaId);
             
             // Relação com SiteInfo

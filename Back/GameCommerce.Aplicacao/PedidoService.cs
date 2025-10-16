@@ -164,6 +164,7 @@ namespace GameCommerce.Aplicacao
                     Telefone = pedidoDto.Telefone,
                     Total = pedidoDto.Total,
                     Frete = pedidoDto.Frete,
+                    CupomId = pedidoDto.CupomId,
                     DescontoAplicado = pedidoDto.DescontoAplicado,
                     DataCriacao = DateTime.UtcNow,
                     MeioPagamento = MeioPagamento.Pix,
@@ -246,6 +247,22 @@ namespace GameCommerce.Aplicacao
             }
         }
 
+        public async Task<bool> ProcessarWebhookPixAsync(string webhookData)
+        {
+            try
+            {
+                //var pedido = await _pedidoPersist.GetByTransactionIdAsync(transactionId, true);
+                //if (pedido == null) return false;
+                //pedido.Status = status;
+                //_pedidoPersist.Update(pedido);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<PedidoResponseDto> VerificarStatusPagamentoAsync(string transactionId, bool includeItens = true)
         {
             try
@@ -311,6 +328,8 @@ namespace GameCommerce.Aplicacao
                 }).ToList()
             };
         }
+
+        
 
     }
 }

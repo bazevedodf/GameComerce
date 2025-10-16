@@ -23,6 +23,16 @@ namespace GameCommerce.Persistencia
             return await query.AsNoTracking().ToArrayAsync();
         }
 
+        public async Task<Produto[]> GetBySiteIdAsync(int siteId, bool includeCategoria = true)
+        {
+            IQueryable<Produto> query = _context.Produtos.Where(p => p.SiteInfoId == siteId && p.Ativo);
+
+            if (includeCategoria)
+                query = query.Include(p => p.Categoria);
+
+            return await query.AsNoTracking().ToArrayAsync();
+        }
+
         public async Task<Produto> GetByIdAsync(int id, bool includeCategoria = true)
         {
             IQueryable<Produto> query = _context.Produtos.Where(p => p.Id == id);
@@ -33,10 +43,10 @@ namespace GameCommerce.Persistencia
             return await query.AsNoTracking().FirstOrDefaultAsync();
         }
 
-        public async Task<Produto[]> GetByCategoriaAsync(string categoriaSlug, bool includeCategoria = true)
+        public async Task<Produto[]> GetByCategoriaAsync(int siteId, string categoriaSlug, bool includeCategoria = true)
         {
             IQueryable<Produto> query = _context.Produtos
-                .Where(p => p.Categoria.Slug == categoriaSlug && p.Ativo);
+                .Where(p => p.SiteInfoId == siteId && p.Categoria.Slug == categoriaSlug && p.Ativo);
 
             if (includeCategoria)
                 query = query.Include(p => p.Categoria);
@@ -44,10 +54,10 @@ namespace GameCommerce.Persistencia
             return await query.AsNoTracking().ToArrayAsync();
         }
 
-        public async Task<Produto[]> GetDestaquesAsync(bool includeCategoria = true)
+        public async Task<Produto[]> GetDestaquesAsync(int siteId, bool includeCategoria = true)
         {
             IQueryable<Produto> query = _context.Produtos
-                .Where(p => p.EmDestaque && p.Ativo);
+                .Where(p => p.SiteInfoId == siteId && p.EmDestaque && p.Ativo);
 
             if (includeCategoria)
                 query = query.Include(p => p.Categoria);
@@ -55,11 +65,11 @@ namespace GameCommerce.Persistencia
             return await query.AsNoTracking().ToArrayAsync();
         }
 
-        public async Task<Produto[]> BuscarAsync(string termo, bool includeCategoria = true)
+        public async Task<Produto[]> BuscarAsync(int siteId, string termo, bool includeCategoria = true)
         {
             // Primeiro busca os produtos por nome e descrição no banco
             IQueryable<Produto> query = _context.Produtos
-                .Where(p => p.Ativo && (
+                .Where(p => p.SiteInfoId == siteId && p.Ativo && (
                     p.Nome.Contains(termo) ||
                     p.Descricao.Contains(termo)
                 ));
@@ -92,11 +102,11 @@ namespace GameCommerce.Persistencia
             return await query.AsNoTracking().ToArrayAsync();
         }
 
-        public async Task<Produto[]> GetMaisVendidosPorCategoriaAsync(bool includeCategoria = true)
+        public async Task<Produto[]> GetMaisVendidosPorCategoriaAsync(int siteId, bool includeCategoria = true)
         {
             // Buscar TODOS os produtos ATIVOS e EM DESTAQUE
             IQueryable<Produto> query = _context.Produtos
-                    .Where(p => p.Ativo && p.EmDestaque)
+                    .Where(p => p.SiteInfoId == siteId && p.Ativo && p.EmDestaque)
                     .OrderByDescending(p => p.TotalAvaliacoes);
 
             // Aplicar include se necessário

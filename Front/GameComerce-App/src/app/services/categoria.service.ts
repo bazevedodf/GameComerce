@@ -21,12 +21,10 @@ export class CategoriaService {
     if (!this.categoriasCache$) {
       this.categoriasCache$ = this.http.get<Categoria[]>(`${this.apiUrl}/categorias`).pipe(
         map(categorias => {
-          console.log('Dados recebidos da API:', categorias);
           return this.prefixarUrls(categorias);
         }),
         take(1), // AGORA O CACHE JÁ TEM AS URLs PREFIXADAS
         catchError(error => {
-          console.error('Erro ao carregar categorias:', error);
           this.categoriasCache$ = undefined;
           throw error;
         })
@@ -37,13 +35,13 @@ export class CategoriaService {
 
   //MÉTODO PARA PREFIXAR URLs NAS IMAGENS E ÍCONES
   private prefixarUrls(categorias: Categoria[]): Categoria[] {
-    console.log('Prefixando URLs para categorias:', categorias);
+    //console.log('Prefixando URLs para categorias:', categorias);
     const categoriasComUrls = categorias.map(categoria => ({
       ...categoria,
       imagem: categoria.imagem ? this.prefixarUrl(categoria.imagem) : categoria.imagem,
       icon: categoria.icon ? this.prefixarUrl(categoria.icon) : categoria.icon,
     }));
-    console.log('Categorias após prefixar URLs:', categoriasComUrls);
+    //console.log('Categorias após prefixar URLs:', categoriasComUrls);
     return categoriasComUrls;
   }
 
@@ -112,13 +110,13 @@ export class CategoriaService {
     );
   }
 
-  // 🔄 Forçar recarregamento (útil quando dados mudam)
+  //Forçar recarregamento (útil quando dados mudam)
   recarregarCategorias(): void {
     this.categoriasCache$ = undefined;
-    console.log('Cache de categorias resetado');
+    //console.log('Cache de categorias resetado');
   }
 
-  // 🎯 Verificar se já tem cache
+  //Verificar se já tem cache
   temCache(): boolean {
     return this.categoriasCache$ !== undefined;
   }

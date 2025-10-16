@@ -6,7 +6,7 @@ namespace GameCommerce.Aplicacao.Interfaces
     {
         Task<SiteInfoDto> AddAsync(SiteInfoDto model);
         Task<SiteInfoDto> UpdateAsync(SiteInfoDto model);
-        Task<bool> DeleteAsync(int id);
+        Task<bool> DeleteAsync(int id, bool realDelete = false);
         Task<SiteInfoDto> GetByIdAsync(int id);
         Task<SiteInfoDto> GetByDominioAsync(string dominio, bool apenasAtivos = true);
         Task<SiteInfoDto[]> GetAllAsync(bool apenasAtivos = true);

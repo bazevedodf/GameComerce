@@ -1,3 +1,5 @@
+import { MarketingTag } from "./MarketingTag";
+
 export interface SiteInfo {
   nome: string;
   dominio?: string;
@@ -9,4 +11,5 @@ export interface SiteInfo {
   facebook?: string;
   whatsapp?: string;
   youTube?: string;
+  marketingTags?: MarketingTag[];
 }

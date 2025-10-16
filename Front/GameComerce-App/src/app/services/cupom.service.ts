@@ -10,7 +10,7 @@ import { environment } from 'src/environments/environment';
 })
 export class CupomService {
 
-  private apiUrl = `${environment.apiUrl}/cupons`;
+  private apiUrl = `${environment.apiUrl}Loja/cupons`;
 
   // MOCK TEMPORÁRIO - REMOVER QUANDO API FICAR PRONTA
   private cuponsMock: Cupom[] = [
@@ -59,33 +59,15 @@ export class CupomService {
   constructor(private http: HttpClient) { }
 
   validarCupom(codigo: string): Observable<Cupom> {
-    // MOCK TEMPORÁRIO - REMOVER QUANDO API FICAR PRONTA
-    console.log('📋 Usando mock temporário de cupom');
-    return of(this.validarCupomMock(codigo)).pipe(
-      delay(1000),
+    //CÓDIGO REAL - DESCOMENTAR QUANDO API ESTIVER PRONTA
+    return this.http.get<Cupom>(`${this.apiUrl}/validar`, {
+      params: { codigo }
+    }).pipe(
       catchError(error => {
         console.error('Erro ao validar cupom:', error);
         return of(this.criarCupomInvalido(codigo, 'Erro ao validar cupom. Tente novamente.'));
       })
     );
-
-    // CÓDIGO REAL - DESCOMENTAR QUANDO API ESTIVER PRONTA
-    // return this.http.get<Cupom>(`${this.apiUrl}/validar`, {
-    //   params: { codigo }
-    // }).pipe(
-    //   catchError(error => {
-    //     console.error('Erro ao validar cupom:', error);
-    //     return of(this.criarCupomInvalido(codigo, 'Erro ao validar cupom. Tente novamente.'));
-    //   })
-    // );
-  }
-
-  aplicarCupomPedido(codigo: string, pedidoId: number): Observable<any> {
-    // MOCK TEMPORÁRIO
-    return of({ success: true }).pipe(delay(500));
-    
-    // CÓDIGO REAL - DESCOMENTAR QUANDO API ESTIVER PRONTA
-    // return this.http.post(`${this.apiUrl}/aplicar`, { codigo, pedidoId });
   }
 
   // MÉTODOS AUXILIARES (permanecem iguais)
@@ -98,13 +80,6 @@ export class CupomService {
     } else {
       return Math.min(cupom.valorDesconto, subtotal);
     }
-  }
-
-  private validarCupomMock(codigo: string): Cupom {
-    const cupomEncontrado = this.cuponsMock.find(c => 
-      c.codigo === codigo.toUpperCase()
-    );
-    return cupomEncontrado || this.criarCupomInvalido(codigo, 'Cupom não encontrado');
   }
 
   private criarCupomInvalido(codigo: string, mensagemErro: string): Cupom {

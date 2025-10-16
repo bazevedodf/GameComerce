@@ -8,5 +8,7 @@
         public decimal? ValorDesconto { get; set; }
         public string TipoDesconto { get; set; } // "percentual", "valor_fixo"
         public string MensagemErro { get; set; }
+        public int SiteInfoId { get; set; }
+        public bool Ativo { get; set; }
     }
 }

@@ -40,8 +40,8 @@ namespace GameCommerce.Persistencia.Mapeamentos
                    .IsRequired();
 
             // Index para busca rápida por código
-            builder.HasIndex(x => x.Codigo)
-                   .IsUnique();
+            //builder.HasIndex(x => new { x.SiteInfoId, x.Codigo })
+            //       .IsUnique();
         }
     }
 }

@@ -63,6 +63,7 @@ static void ConfigureServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<ICupomPersist, CupomPersist>();
     builder.Services.AddScoped<IPedidoPersist, PedidoPersist>();
     builder.Services.AddScoped<ISiteInfoPersist, SiteInfoPersist>();
+    builder.Services.AddScoped<IMarketingTagPersist, MarketingTagPersist>();
     builder.Services.AddScoped<ITransacaoPagamentoPersist, TransacaoPagamentoPersist>();
 
     // Registrar o HttpClient para GatewayService
@@ -75,6 +76,7 @@ static void ConfigureServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<IGatewayService, GatewayService>();
     builder.Services.AddScoped<IPedidoService, PedidoService>();
     builder.Services.AddScoped<ISiteInfoService, SiteInfoService>();
+    builder.Services.AddScoped<IMarketingTagService, MarketingTagService>();
 
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(options =>
@@ -120,7 +122,8 @@ static void ConfigureServices(WebApplicationBuilder builder)
 static void ConfigureAplication(WebApplication app)
 {
     // Criar pastas de upload
-    var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+    //var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+    var uploadsPath = app.Configuration["Uploads:RootPath"] ?? "Uploads";
     var produtosPath = Path.Combine(uploadsPath, "produtos");
     var categoriasPath = Path.Combine(uploadsPath, "categorias");
 
