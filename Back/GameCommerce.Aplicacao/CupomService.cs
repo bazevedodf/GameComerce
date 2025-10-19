@@ -198,5 +198,19 @@ namespace GameCommerce.Aplicacao
                 throw new Exception($"Erro ao clonar cupons: {ex.Message}");
             }
         }
+
+
+        //Metodos Quantitativos
+        public async Task<int> GetCountAsync(int? siteInfoId = null, bool apenasAtivos = true)
+        {
+            try
+            {
+                return await _cupomPersist.GetCountAsync(siteInfoId, apenasAtivos);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao contar cupons: {ex.Message}");
+            }
+        }
     }
 }

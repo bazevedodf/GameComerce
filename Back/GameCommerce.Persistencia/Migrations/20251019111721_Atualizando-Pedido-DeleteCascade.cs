@@ -5,7 +5,7 @@
 namespace GameCommerce.Persistencia.Migrations
 {
     /// <inheritdoc />
-    public partial class AtualizacaoCupomindex : Migration
+    public partial class AtualizandoPedidoDeleteCascade : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

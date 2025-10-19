@@ -18,6 +18,7 @@ namespace GameCommerce.Aplicacao.Helpers
             CreateMap<SiteInfo, SiteInfoDto>().ReverseMap();
             CreateMap<MarketingTag, MarketingTagDto>().ReverseMap();
             CreateMap<Subcategoria, SubcategoriaDto>().ReverseMap();
+            CreateMap<TransacaoPagamento, TransacaoPagamentoDto>().ReverseMap();
         }
     }
 }

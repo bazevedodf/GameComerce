@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using GameCommerce.Dominio.Enuns;
+using System.ComponentModel.DataAnnotations;
 
 namespace GameCommerce.Aplicacao.Dtos
 {
@@ -40,10 +41,11 @@ namespace GameCommerce.Aplicacao.Dtos
         public CupomDto? Cupom { get; set; }
         public int? SiteInfoId { get; set; }
         public SiteInfoDto? SiteInfo { get; set; }
+        //public int? TransacaoId { get; set; }
+        public TransacaoPagamentoDto? TransacaoPagamento { get; set; }
 
         [Required(ErrorMessage = "Itens são obrigatórios")]
         [MinLength(1, ErrorMessage = "Pedido deve ter pelo menos 1 item")]
         public List<ItemPedidoDto>? Itens { get; set; }
-        public TransacaoPagamentoDto? TransacaoPagamento { get; set; }
     }
 }

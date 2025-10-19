@@ -1,0 +1,36 @@
+<!-- Container principal apenas para páginas com layout -->
+<div *ngIf="!isLoginPage()" class="app-container" [class.sidebar-collapsed]="isSidebarCollapsed" [class.mobile-view]="isMobile">
+  
+  <!-- Spinner Global -->
+  <app-loading-spinner 
+    [isLoading]="globalLoading"
+    [message]="loadingMessage"
+    [subMessage]="loadingSubMessage">
+  </app-loading-spinner>
+  
+  <!-- Sidebar -->
+  <app-sidebar 
+    [isCollapsed]="isSidebarCollapsed" 
+    (toggleSidebar)="onSidebarToggle($event)">
+  </app-sidebar>
+
+  <!-- Overlay para mobile quando sidebar está aberto -->
+  <div *ngIf="isMobile && !isSidebarCollapsed" 
+       class="sidebar-overlay"
+       (click)="toggleSidebar()">
+  </div>
+
+  <!-- Content Area -->
+  <div class="content-area">
+    <!-- Top Navigation -->
+    <app-header (sidebarToggle)="toggleSidebar()"></app-header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
+
+<!-- Página de Login Fullscreen (fora do container do layout) -->
+<app-login *ngIf="isLoginPage()"></app-login>

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GameCommerce.Persistencia.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251016015908_Atualizacao-Cupom-index")]
-    partial class AtualizacaoCupomindex
+    [Migration("20251019111721_Atualizando-Pedido-DeleteCascade")]
+    partial class AtualizandoPedidoDeleteCascade
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

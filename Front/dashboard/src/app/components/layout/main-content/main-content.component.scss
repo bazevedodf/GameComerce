@@ -1,0 +1,16 @@
+.main-content-container {
+  padding: 0;
+  min-height: calc(100vh - 80px);
+  position: relative;
+  z-index: 1; // Mantém atrás do sidebar
+  
+  // Garante que em mobile o conteúdo não ultrapasse o sidebar
+  @media (max-width: 991.98px) {
+    overflow-x: hidden;
+  }
+}
+
+app-dashboard-home {
+  display: block;
+  width: 100%;
+}

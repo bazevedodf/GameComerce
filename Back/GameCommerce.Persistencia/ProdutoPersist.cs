@@ -65,6 +65,21 @@ namespace GameCommerce.Persistencia
             return await query.AsNoTracking().ToArrayAsync();
         }
 
+        public async Task<int> GetCountAsync(int? SiteInfoId = null, bool apenasAtivos = true)
+        {
+            IQueryable<Produto> query = _context.Produtos;
+
+            // Filtro por site (se informado)
+            if (SiteInfoId.HasValue)
+                query = query.Where(p => p.SiteInfoId == SiteInfoId.Value);
+
+            // Filtro por status ativo
+            if (apenasAtivos)
+                query = query.Where(p => p.Ativo);
+
+            return await query.CountAsync();
+        }
+
         public async Task<Produto[]> BuscarAsync(int siteId, string termo, bool includeCategoria = true)
         {
             // Primeiro busca os produtos por nome e descrição no banco

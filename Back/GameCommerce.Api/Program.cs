@@ -1,5 +1,6 @@
 using GameCommerce.Aplicacao;
 using GameCommerce.Aplicacao.Interfaces;
+using GameCommerce.Aplicacao.Services;
 using GameCommerce.Persistencia;
 using GameCommerce.Persistencia.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -77,6 +78,7 @@ static void ConfigureServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<IPedidoService, PedidoService>();
     builder.Services.AddScoped<ISiteInfoService, SiteInfoService>();
     builder.Services.AddScoped<IMarketingTagService, MarketingTagService>();
+    builder.Services.AddScoped<IDashboardService, DashboardService>();
 
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(options =>

@@ -139,6 +139,18 @@ namespace GameCommerce.Aplicacao
             }
         }
 
+        public async Task<int> GetCountAsync(int? SiteInfoId = null, bool apenasAtivos = true)
+        {
+            try
+            {
+                return await _produtoPersist.GetCountAsync(SiteInfoId, apenasAtivos);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao contar produtos: {ex.Message}");
+            }
+        }
+
         public async Task<ProdutoDto[]> BuscarAsync(int siteId, string termo, bool includeCategoria = true)
         {
             try

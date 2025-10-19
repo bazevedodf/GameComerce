@@ -13,6 +13,7 @@ namespace GameCommerce.Aplicacao.Interfaces
         Task<ProdutoDto> GetByIdAsync(int id, bool includeCategoria = true);
         Task<ProdutoDto[]> GetByTagAsync(string tag, bool includeCategoria = true);
         Task<ProdutoDto[]> GetAllBySiteIdAsync(int siteId, bool includeCategoria = true);
+        Task<int> GetCountAsync(int? SiteInfoId = null, bool apenasAtivos = true);
         Task<ProdutoDto[]> BuscarAsync(int siteId, string termo, bool includeCategoria = true);
         Task<ProdutoDto[]> GetMaisVendidosPorCategoriaAsync(int siteId, bool includeCategoria = true);
         Task<ProdutoDto[]> GetByCategoriaAsync(int siteId, string categoriaSlug, bool includeCategoria = true);

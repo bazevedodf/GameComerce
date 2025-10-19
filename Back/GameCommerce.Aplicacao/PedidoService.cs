@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using GameCommerce.Aplicacao.Dtos;
+using GameCommerce.Aplicacao.Helpers;
 using GameCommerce.Aplicacao.Interfaces;
 using GameCommerce.Dominio;
 using GameCommerce.Dominio.Enuns;
+using GameCommerce.Persistencia;
 using GameCommerce.Persistencia.Interfaces;
 using Microsoft.Extensions.Configuration;
 
@@ -42,7 +44,7 @@ namespace GameCommerce.Aplicacao
 
                 if (await _pedidoPersist.SaveChangeAsync())
                 {
-                    var retorno = await _pedidoPersist.GetByIdAsync(pedido.Id, true, true);
+                    var retorno = await _pedidoPersist.GetByIdAsync(pedido.Id, true);
                     return _mapper.Map<PedidoDto>(retorno);
                 }
                 return null;
@@ -57,7 +59,7 @@ namespace GameCommerce.Aplicacao
         {
             try
             {
-                var pedido = await _pedidoPersist.GetByIdAsync(model.Id, true, true);
+                var pedido = await _pedidoPersist.GetByIdAsync(model.Id, true);
                 if (pedido == null) return null;
 
                 _mapper.Map(model, pedido);
@@ -65,7 +67,7 @@ namespace GameCommerce.Aplicacao
 
                 if (await _pedidoPersist.SaveChangeAsync())
                 {
-                    var retorno = await _pedidoPersist.GetByIdAsync(pedido.Id, true, true);
+                    var retorno = await _pedidoPersist.GetByIdAsync(pedido.Id, true);
                     return _mapper.Map<PedidoDto>(retorno);
                 }
                 return null;
@@ -83,8 +85,7 @@ namespace GameCommerce.Aplicacao
                 var pedido = await _pedidoPersist.GetByIdAsync(id);
                 if (pedido == null) return false;
 
-                pedido.Status = StatusPedido.deleted.ToString();
-                _pedidoPersist.Update(pedido);
+                _pedidoPersist.Delete(pedido);
 
                 return await _pedidoPersist.SaveChangeAsync();
             }
@@ -94,11 +95,13 @@ namespace GameCommerce.Aplicacao
             }
         }
 
-        public async Task<PedidoDto> GetByIdAsync(int id)
+
+
+        public async Task<PedidoDto> GetByIdAsync(int id, bool includeItens = true)
         {
             try
             {
-                var pedido = await _pedidoPersist.GetByIdAsync(id, true, true);
+                var pedido = await _pedidoPersist.GetByIdAsync(id, includeItens);
                 if (pedido == null) return null;
 
                 return _mapper.Map<PedidoDto>(pedido);
@@ -109,11 +112,11 @@ namespace GameCommerce.Aplicacao
             }
         }
 
-        public async Task<PedidoDto[]> GetAllAsync()
+        public async Task<PedidoDto[]> GetAllAsync(bool includeItens = true)
         {
             try
             {
-                var pedidos = await _pedidoPersist.GetAllAsync(true, true);
+                var pedidos = await _pedidoPersist.GetAllAsync(includeItens);
                 if (pedidos == null) return null;
 
                 return _mapper.Map<PedidoDto[]>(pedidos);
@@ -124,11 +127,11 @@ namespace GameCommerce.Aplicacao
             }
         }
 
-        public async Task<PedidoDto> GetByTransactionIdAsync(string transactionId)
+        public async Task<PedidoDto> GetByTransactionIdAsync(string transactionId, bool includeItens = true)
         {
             try
             {
-                var pedido = await _pedidoPersist.GetByTransactionIdAsync(transactionId, true);
+                var pedido = await _pedidoPersist.GetByTransactionIdAsync(transactionId, includeItens);
                 if (pedido == null) return null;
 
                 return _mapper.Map<PedidoDto>(pedido);
@@ -138,12 +141,25 @@ namespace GameCommerce.Aplicacao
                 throw new Exception(ex.Message);
             }
         }
-
-        public async Task<PedidoDto[]> GetByStatusAsync(string status)
+        public async Task<PedidoDto[]> GetAllBySiteInfoIdAsync(int siteInfoId, bool includeItens = true)
         {
             try
             {
-                var pedidos = await _pedidoPersist.GetByStatusAsync(status, true);
+                var pedidos = await _pedidoPersist.GetAllBySiteInfoIdAsync(siteInfoId, true);
+                if (pedidos == null) return null;
+
+                return _mapper.Map<PedidoDto[]>(pedidos);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<PedidoDto[]> GetByStatusAsync(string status, bool includeItens = true)
+        {
+            try
+            {
+                var pedidos = await _pedidoPersist.GetByStatusAsync(status, includeItens);
                 if (pedidos == null) return null;
 
                 return _mapper.Map<PedidoDto[]>(pedidos);
@@ -154,6 +170,76 @@ namespace GameCommerce.Aplicacao
             }
         }
 
+        //Metodos Paginados
+        public async Task<PagedResponse<PedidoDto>> GetPaginatedBySiteInfoIdAsync(int page = 1, int pageSize = 10, int? siteInfoId = null, bool includeItens = true)
+        {
+            try
+            {
+                // Buscar dados paginados do banco
+                var pedidos = await _pedidoPersist.GetPaginatedBySiteInfoIdAsync(page, pageSize, siteInfoId, includeItens);
+                var totalItems = await _pedidoPersist.GetCountAsync(siteInfoId);
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                if (pedidos == null || !pedidos.Any())
+                    return new PagedResponse<PedidoDto>
+                    {
+                        Data = new List<PedidoDto>(),
+                        Pagination = new PaginationInfo
+                        {
+                            CurrentPage = page,
+                            TotalPages = totalPages,
+                            TotalItems = totalItems,
+                            PageSize = pageSize
+                        }
+                    };
+
+                var pedidosDto = _mapper.Map<PedidoDto[]>(pedidos);
+
+                return new PagedResponse<PedidoDto>
+                {
+                    Data = pedidosDto.ToList(),
+                    Pagination = new PaginationInfo
+                    {
+                        CurrentPage = page,
+                        TotalPages = totalPages,
+                        TotalItems = totalItems,
+                        PageSize = pageSize
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        //Metodos Quantitativos
+        public async Task<int> GetCountAsync(int? siteInfoId = null)
+        {
+            try
+            {
+                return await _pedidoPersist.GetCountAsync(siteInfoId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao contar pedidos: {ex.Message}");
+            }
+        }
+
+        public async Task<int> GetCountPagosAsync(int? siteInfoId = null)
+        {
+            try
+            {
+                return await _pedidoPersist.GetCountPagosAsync(siteInfoId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao contar pedidos pagos: {ex.Message}");
+            }
+        }
+
+
+        // Métodos específicos para PIX - AGORA RETORNAM PedidoResponseDto
         public async Task<PedidoResponseDto> ProcessarPagamentoPixAsync(PedidoDto pedidoDto)
         {
             try

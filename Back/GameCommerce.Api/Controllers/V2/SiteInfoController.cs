@@ -1,6 +1,9 @@
-﻿using GameCommerce.Aplicacao.Dtos;
+﻿using GameCommerce.Aplicacao;
+using GameCommerce.Aplicacao.Dtos;
+using GameCommerce.Aplicacao.Helpers;
 using GameCommerce.Aplicacao.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace GameCommerce.Api.Controllers.V2
 {
@@ -14,6 +17,8 @@ namespace GameCommerce.Api.Controllers.V2
         private readonly IProdutoService _produtoService;
         private readonly ICupomService _cupomService;
         private readonly IWebHostEnvironment _environment;
+
+        private Util _util;
 
         public SiteInfoController(
             ISiteInfoService siteInfoService,
@@ -91,13 +96,37 @@ namespace GameCommerce.Api.Controllers.V2
         }
 
         /// <summary>
+        /// Buscar sites por termo (email ou telefone) (Admin)
+        /// </summary>
+        /// <param name="termo">Termo para buscar no email ou telefone</param>
+        /// <param name="apenasAtivos">Filtrar apenas sites ativos (padrão: true)</param>
+        [HttpGet("buscar")]
+        public async Task<ActionResult<SiteInfoDto[]>> GetByTerm(string termo, bool apenasAtivos = true)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(termo))
+                    return BadRequest("Termo de busca é obrigatório");
+
+                var sites = await _siteInfoService.GetByTermAsync(termo, apenasAtivos);
+
+                if (sites == null || !sites.Any())
+                    return NotFound($"Nenhum site encontrado para: {termo}");
+
+                return Ok(sites);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro ao buscar sites: {ex.Message}");
+            }
+        }
+
+
+        /// <summary>
         /// Clonar site completo (Admin)
         /// </summary>
         [HttpPost("clonar/{id}")]
-        public async Task<IActionResult> ClonarSite(int id, 
-                            bool clonarCategorias = true, 
-                            bool clonarProdutos = true,
-                            bool clonarCupons = true)
+        public async Task<IActionResult> ClonarSite(int id, bool clonarCategorias = true, bool clonarProdutos = true, bool clonarCupons = true)
         {
             SiteInfoDto siteClonado = null;
 
@@ -108,8 +137,6 @@ namespace GameCommerce.Api.Controllers.V2
                 if (siteOriginal == null)
                     return NotFound($"Site com ID {id} não encontrado");
 
-                // REGRA 1: Nome com " - (copia)"
-                // REGRA 2: Domínio como "localhost" e status ativo
                 var novoSite = new SiteInfoDto
                 {
                     Nome = $"{siteOriginal.Nome} - (copia)",
@@ -121,9 +148,9 @@ namespace GameCommerce.Api.Controllers.V2
                     Instagram = siteOriginal.Instagram,
                     Facebook = siteOriginal.Facebook,
                     Whatsapp = siteOriginal.Whatsapp,
-                    ApiKey = null, // Não copiar API key por segurança
-                    BaseUrl = "http://localhost",
-                    Ativo = true, // REGRA 2: Sempre ativo
+                    ApiKey = siteOriginal.ApiKey,
+                    BaseUrl = siteOriginal.BaseUrl,
+                    Ativo = true,
                     MarketingTags = siteOriginal.MarketingTags?.Select(t => new MarketingTagDto
                     {
                         Tipo = t.Tipo,
@@ -186,6 +213,25 @@ namespace GameCommerce.Api.Controllers.V2
                     Mensagem = "Erro durante a clonagem do site",
                     Detalhes = ex.Message
                 });
+            }
+        }
+
+        // GET: api/v2/SiteInfo/SitesTotalizados
+        [HttpGet("SitesTotalizados")]
+        public async Task<ActionResult<PagedResponse<SiteConsolidadoDto>>> GetAllConsolidadoAsync(int page = 1, int pageSize = 10, string? search = null, bool apenasAtivos = false)
+        {
+            try
+            {
+
+                // 2. Buscar no banco (apenas sites ativos)
+                var sitesPaginados = await _siteInfoService.GetAllConsolidadoAsync(page, pageSize, search, apenasAtivos);
+
+                // 3. Retorna os dados do site
+                return Ok(sitesPaginados);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro interno: {ex.Message}");
             }
         }
 

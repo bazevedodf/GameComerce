@@ -1,0 +1,399 @@
+<div class="pedidos-page">
+  <!-- Header da Página -->
+  <div class="page-header mb-3">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="bi bi-receipt me-2"></i>
+        Pedidos
+      </h1>
+      <p class="page-subtitle">Gerencie todos os pedidos do e-commerce</p>
+    </div>
+  </div>
+
+  <!-- Filtros e Listagem -->
+  <div class="content-section">
+    <!-- Filtro por Site -->
+    <div class="site-filter-card">
+      <div class="card-body p-3">
+        <div class="row g-3 align-items-end">
+          <!-- Seleção de Site -->
+          <div class="col-md-12">
+            <label class="form-label" *ngIf="!selectedSite">Selecione um Site</label>
+            <label class="form-label" *ngIf="selectedSite">Site Selecionado</label>
+            <div class="site-selector">
+              <div class="search-box" *ngIf="!selectedSite">
+                <i class="bi bi-search"></i>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Digite o nome ou domínio do site..."
+                  [(ngModel)]="siteSearchTerm"
+                  (input)="onSiteSearchInput($event)"
+                />
+              </div>
+              
+              <!-- Dropdown de Sites -->
+              <div class="sites-dropdown" *ngIf="showSitesDropdown">
+                <div class="dropdown-list">
+                  <div 
+                    *ngFor="let site of filteredSites"
+                    class="dropdown-item"
+                    (click)="selectSite(site)"
+                  >
+                    <div class="site-info">
+                      <div class="site-name">{{ site.nome }}</div>
+                      <div class="site-domain">{{ site.dominio }}</div>
+                    </div>
+                  </div>
+                  <div *ngIf="filteredSites.length === 0" class="dropdown-item text-center text-theme-secondary">
+                    Nenhum site encontrado
+                  </div>
+                </div>
+              </div>
+
+              <!-- Site Selecionado -->
+              <div class="selected-site" *ngIf="selectedSite">
+                <span class="selected-site-badge">
+                  {{ selectedSite.nome }} ({{ selectedSite.dominio }})
+                  <button class="btn-remove-site" (click)="clearSiteSelection()">
+                    <i class="bi bi-x"></i>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Listagem de Pedidos -->
+    <div class="pedidos-list-card">
+      <div class="card-body p-3">
+        
+        <!-- Header da Lista com Pesquisa -->
+        <div class="row g-3 align-items-center pb-3 border-bottom">
+            <div class="col-md-10">
+                <h6 class="mb-0 text-theme-primary">
+                <i class="bi bi-list-ul me-2"></i>
+                Pedidos do site: <strong>{{ selectedSite?.nome }}</strong>
+                </h6>
+            </div>
+        </div>
+
+        <div class="row g-3 align-items-center mt-3 pb-3 border-bottom">
+            <div class="col-md-9">
+                <div class="site-selector">
+                    <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Pesquisar por email ou telefone..."
+                        [(ngModel)]="pedidoSearchTerm"
+                        (keyup.enter)="onPedidoSearch()"
+                        (input)="onPedidoSearchInput($event)" />
+                    </div>
+                </div>                
+            </div>
+            <div class="col-md-3">
+                <button 
+                class="btn btn-danger w-100" 
+                (click)="openDeleteMultipleModal()"
+                [disabled]="selectedPedidos.length === 0">
+                    <i class="bi bi-trash me-2"></i>
+                    Selecionados ({{ selectedPedidos.length }})
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabela de Pedidos -->
+        <div class="table-responsive pb-3 mt-3">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th width="50">
+                  <input class="form-check-input" type="checkbox" />
+                </th>
+                <th width="60">ID</th>
+                <th>Email</th>
+                <th>Telefone</th>
+                <th>Total</th>
+                <th width="80">Status</th>
+                <th width="80">Data</th>
+                <th width="100" class="text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="!loading && pedidosFiltrados.length === 0">
+                <td colspan="8" class="text-center py-4">
+                  <i class="bi bi-inbox display-4 text-theme-secondary"></i>
+                  <p class="mt-2 mb-0 text-theme-secondary" *ngIf="pedidoSearchTerm">
+                    Nenhum pedido encontrado para "{{ pedidoSearchTerm }}"
+                  </p>
+                  <p class="mt-2 mb-0 text-theme-secondary" *ngIf="!pedidoSearchTerm">
+                    Nenhum pedido encontrado para este site
+                  </p>
+                </td>
+              </tr>
+              <tr *ngFor="let pedido of pedidosFiltrados"
+                (click)="openDetailModal(pedido)"
+                style="cursor: pointer">
+                <td>
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    [checked]="isPedidoSelected(pedido)"
+                    (click)="$event.stopPropagation(); togglePedidoSelection(pedido)" />
+                </td>
+                <td>
+                  <span class="pedido-id">#{{ pedido.id.toString().padStart(3, '0') }}</span>
+                </td>
+                <td>
+                  <div class="pedido-email">
+                    {{ pedido.email }}
+                  </div>
+                </td>
+                <td>
+                  <div class="pedido-telefone">
+                    {{ pedido.telefone }}
+                  </div>
+                </td>
+                <td>
+                  <span class="pedido-total">
+                    R$ {{ pedido.total | number:'1.2-2' }}
+                  </span>
+                </td>
+                <td>
+                  <span [class]="'badge ' + getStatusBadgeClass(pedido.status)">
+                    {{ pedido.status }}
+                  </span>
+                </td>
+                <td>
+                  <span class="pedido-data">
+                    {{ pedido.dataCriacao | date:'dd/MM/yyyy HH:mm:ss' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm d-flex justify-content-center" role="group">
+                    <!-- Botão Detalhes -->
+                    <button
+                      class="btn btn-primary"
+                      title="Ver detalhes"
+                      (click)="openDetailModal(pedido); $event.stopPropagation()">
+                      <i class="bi bi-eye"></i>
+                    </button>
+
+                    <!-- Botão Deletar -->
+                    <button
+                      class="btn btn-danger"
+                      title="Excluir pedido"
+                      (click)="openDeleteModal(pedido); $event.stopPropagation()">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginação -->
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="form-label">
+            Mostrando <strong>{{ pedidosFiltrados.length }}</strong> de
+            <strong>{{ pagination.totalItems }}</strong> pedidos
+          </div>
+          <nav>
+            <ul class="pagination pagination-sm mb-0">
+              <li class="page-item" [class.disabled]="!pagination.hasPrevious">
+                <a
+                  class="page-link"
+                  href="javascript:void(0)"
+                  (click)="pagination.hasPrevious && onPageChange(pagination.currentPage - 1)"
+                >
+                  Anterior
+                </a>
+              </li>
+
+              <li
+                *ngFor="let page of getPagesArray()"
+                class="page-item"
+                [class.active]="page === pagination.currentPage"
+              >
+                <a
+                  class="page-link"
+                  href="javascript:void(0)"
+                  (click)="onPageChange(page)"
+                >
+                  {{ page }}
+                </a>
+              </li>
+
+              <li class="page-item" [class.disabled]="!pagination.hasNext">
+                <a
+                  class="page-link"
+                  href="javascript:void(0)"
+                  (click)="pagination.hasNext && onPageChange(pagination.currentPage + 1)"
+                >
+                  Próxima
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalhes do Pedido -->
+<div class="modal fade" id="pedidoDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-receipt me-2"></i>
+          Detalhes do Pedido #{{ selectedPedido?.id?.toString()?.padStart(3, '0') }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Informações do Cliente -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <h6 class="section-title">Informações do Cliente</h6>
+            <div class="info-group">
+              <label>Email:</label>
+              <span>{{ selectedPedido?.email }}</span>
+            </div>
+            <div class="info-group">
+              <label>Telefone:</label>
+              <span>{{ selectedPedido?.telefone }}</span>
+            </div>
+            <div class="info-group">
+              <label>Status:</label>
+              <span [class]="'badge ' + getStatusBadgeClass(selectedPedido?.status)">
+                {{ selectedPedido?.status }}
+              </span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6 class="section-title">Informações do Pedido</h6>
+            <div class="info-group">
+              <label>Data:</label>
+              <span>{{ selectedPedido?.dataCriacao | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="info-group">
+              <label>Pagamento:</label>
+              <span>{{ selectedPedido?.meioPagamento }}</span>
+            </div>
+            <div class="info-group">
+                <label>Frete:</label>
+                <span>R$ {{ selectedPedido?.frete || 0 | number:'1.2-2' }}</span>
+            </div>
+            <div class="info-group">
+                <label>Total:</label>
+                <span>R$ {{ selectedPedido?.total || 0 | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Itens do Pedido -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <h6 class="section-title">Itens do Pedido</h6>
+            <div class="table-responsive">
+              <table class="table table-hover table-sm">
+                <thead class="table-light">
+                  <tr>
+                    <th>Produto</th>
+                    <th width="100" class="text-center">Qtd</th>
+                    <th width="120" class="text-end">Valor Unit.</th>
+                    <th width="120" class="text-end">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of selectedPedido?.itens">
+                    <td>{{ item.produto?.nome || 'Produto ' + item.produtoId }}</td>
+                    <td class="text-center">{{ item.quantidade }}</td>
+                    <td class="text-end">R$ {{ item.precoUnitario | number:'1.2-2' }}</td>
+                    <td class="text-end">R$ {{ item.subtotal | number:'1.2-2' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmação para Excluir -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-exclamation-triangle me-2 text-warning"></i>
+          Excluir Pedido
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Tem certeza que deseja excluir o pedido 
+          <strong>#{{ pedidoToDelete?.id?.toString()?.padStart(3, '0') }}</strong>?
+        </p>
+        <p class="text-warning">
+          <i class="bi bi-exclamation-triangle"></i>
+          Esta ação não pode ser desfeita.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()">Excluir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para confirmar exclusão múltipla -->
+<div class="modal fade" id="confirmDeleteMultipleModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-exclamation-triangle me-2 text-warning"></i>
+          Excluir Pedidos Selecionados
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Tem certeza que deseja excluir <strong>{{ selectedPedidos.length }}</strong> pedido(s) selecionado(s)?
+        </p>
+        <div class="selected-pedidos-list" *ngIf="selectedPedidos.length > 0">
+          <h6 class="mb-2">Pedidos a serem excluídos:</h6>
+          <div class="selected-pedidos">
+            <span *ngFor="let pedido of selectedPedidos" class="selected-pedido-badge">
+              #{{ pedido.id.toString().padStart(3, '0') }}
+            </span>
+          </div>
+        </div>
+        <p class="text-warning mt-3">
+          <i class="bi bi-exclamation-triangle"></i>
+          Esta ação não pode ser desfeita.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDeleteMultiple()">Excluir {{ selectedPedidos.length }} Pedido(s)</button>
+      </div>
+    </div>
+  </div>
+</div>

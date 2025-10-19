@@ -53,5 +53,21 @@ namespace GameCommerce.Persistencia
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
         }
+
+        //Metodos Quantitativos
+        public async Task<int> GetCountAsync(int? siteInfoId = null, bool apenasAtivos = true)
+        {
+            IQueryable<Cupom> query = _context.Cupons;
+
+            // Filtro por site (se informado)
+            if (siteInfoId.HasValue)
+                query = query.Where(c => c.SiteInfoId == siteInfoId.Value);
+
+            // Filtro por status ativo
+            if (apenasAtivos)
+                query = query.Where(c => c.Ativo && c.Valido);
+
+            return await query.CountAsync();
+        }
     }
 }

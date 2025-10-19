@@ -1,0 +1,16 @@
+<div *ngIf="isVisible" 
+     class="toast-container"
+     [class.hiding]="isHiding"
+     [class]="'toast-' + type">
+  
+  <!-- Ícone -->
+  <div class="toast-icon">
+    <i [class]="getIconClass()"></i>
+  </div>
+  
+  <!-- Mensagem -->
+  <div class="toast-message">
+    {{ message }}
+  </div>
+
+</div>

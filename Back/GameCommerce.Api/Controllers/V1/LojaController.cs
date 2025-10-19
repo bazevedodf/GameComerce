@@ -1,5 +1,6 @@
 ﻿using GameCommerce.Aplicacao;
 using GameCommerce.Aplicacao.Dtos;
+using GameCommerce.Aplicacao.Helpers;
 using GameCommerce.Aplicacao.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;

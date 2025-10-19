@@ -13,6 +13,9 @@ namespace GameCommerce.Aplicacao.Interfaces
         Task<MarketingTagDto[]> GetBySiteInfoIdAsync(int siteInfoId, bool apenasAtivos = true);
         Task<MarketingTagDto[]> GetByTipoAsync(string tipo, int siteInfoId, bool apenasAtivos = true);
         Task<MarketingTagDto[]> GetByIdentificadorAsync(string identificador, int siteInfoId, bool apenasAtivos = true);
+
+        //Metodos Quantitativos
+        Task<int> GetCountAsync(int? siteInfoId = null, bool apenasAtivos = true);
     }
 
 }

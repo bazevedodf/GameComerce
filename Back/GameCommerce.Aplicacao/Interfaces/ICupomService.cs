@@ -15,5 +15,8 @@ namespace GameCommerce.Aplicacao.Interfaces
         Task<CupomDto[]> GetAllAsync(bool apenasAtivos = true);
         
         Task<int> ClonarCuponsAsync(int siteOrigemId, int siteDestinoId);
+
+        //Metodos Quantitativos
+        Task<int> GetCountAsync(int? siteInfoId = null, bool apenasAtivos = true);
     }
 }

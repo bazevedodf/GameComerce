@@ -29,7 +29,8 @@ namespace GameCommerce.Persistencia.Mapeamentos
             // Relacionamento com Pedido
             builder.HasOne(x => x.Pedido)
                    .WithMany(x => x.Itens)
-                   .HasForeignKey(x => x.PedidoId);
+                   .HasForeignKey(x => x.PedidoId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             // Relacionamento com Produto
             builder.HasOne(x => x.Produto)

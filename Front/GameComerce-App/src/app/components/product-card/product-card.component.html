@@ -21,9 +21,9 @@
       
       <!-- Botão Comprar Agora -->
       <button class="btn btn-success fw-bold px-4 py-2 mb-2 buy-now-btn"
-              (click)="comprarAgora($event)"
+              [routerLink]="['/produto', produto.id]"
               title="Comprar Agora">
-        🚀 Comprar Agora
+        Detalhes
       </button>
 
       <!-- Botão Adicionar ao Carrinho -->

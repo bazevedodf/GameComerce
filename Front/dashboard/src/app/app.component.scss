@@ -1,0 +1,81 @@
+.app-container {
+  display: flex;
+  height: 100vh;
+  background-color: var(--bg-primary);
+  position: relative;
+
+  &.mobile-view {
+    .sidebar {
+      transform: translateX(-100%);
+      
+      &.collapsed {
+        transform: translateX(-100%);
+      }
+    }
+
+    .content-area {
+      margin-left: 60 !important;
+    }
+
+    @media (max-width: 991.98px) {
+      .content-area {
+        margin-left: 0 !important;
+      }
+    }    
+
+    &.sidebar-collapsed {
+      .sidebar {
+        transform: translateX(0);
+      }
+    }
+  }
+}
+
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 264px; // Largura da sidebar normal
+  transition: margin-left 0.3s ease;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background-color: var(--bg-primary);
+}
+
+// Classe para quando a sidebar estiver recolhida
+.sidebar-collapsed {
+  .content-area {
+    margin-left: 60px; // Largura da sidebar recolhida
+  }
+}
+
+// Overlay para mobile
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  backdrop-filter: blur(2px);
+
+  @media (min-width: 992px) {
+    display: none;
+  }
+}
+
+// Media queries para responsividade
+@media (max-width: 991.98px) {
+  .content-area {
+    margin-left: 60 !important;
+  }
+
+  .sidebar-collapsed {
+    margin-left: 60 !important;
+  }
+}

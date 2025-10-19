@@ -63,5 +63,21 @@ namespace GameCommerce.Persistencia
 
             return await query.AsNoTracking().ToArrayAsync();
         }
+
+        //Metodos Quantitativos
+        public async Task<int> GetCountAsync(int? siteInfoId = null, bool apenasAtivos = true)
+        {
+            IQueryable<MarketingTag> query = _context.MarketingTags;
+
+            // Filtro por site (se informado)
+            if (siteInfoId.HasValue)
+                query = query.Where(m => m.SiteInfoId == siteInfoId.Value);
+
+            // Filtro por status ativo
+            if (apenasAtivos)
+                query = query.Where(m => m.Ativo);
+
+            return await query.CountAsync();
+        }
     }
 }

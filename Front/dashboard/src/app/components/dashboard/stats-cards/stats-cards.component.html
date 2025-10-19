@@ -1,0 +1,71 @@
+<div class="stats-section">
+  <div class="row g-3">
+    <!-- Sites Ativos -->
+    <div class="col-xl-3 col-md-6">
+      <div class="stats-card">
+        <div class="card-icon bg-primary">
+          <i class="bi bi-globe"></i>
+        </div>
+        <div class="card-content">
+          <p class="card-label">Sites Ativos</p>
+          <h3 class="card-value">{{ stats.totalSitesAtivos }}</h3>
+          <!-- <p class="card-trend positive">
+            <i class="bi bi-arrow-up"></i>
+            12% desde último mês
+          </p> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Total de Produtos -->
+    <div class="col-xl-3 col-md-6">
+      <div class="stats-card">
+        <div class="card-icon bg-secondary">
+          <i class="bi bi-bag"></i>
+        </div>
+        <div class="card-content">
+          <p class="card-label">Produtos</p>
+          <h3 class="card-value">{{ stats.totalProdutos }}</h3>
+          <!-- <p class="card-trend positive">
+            <i class="bi bi-arrow-up"></i>
+            8% desde último mês
+          </p> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Pedidos -->
+    <div class="col-xl-3 col-md-6">
+      <div class="stats-card">
+        <div class="card-icon bg-success">
+          <i class="bi bi-cart-check"></i>
+        </div>
+        <div class="card-content">
+          <p class="card-label">Pedidos Pagos</p>
+          <h3 class="card-value">{{ stats.totalPedidosPagos }}/{{ stats.totalPedidos }}</h3>
+          <!-- <p class="card-trend positive">
+            <i class="bi bi-arrow-up"></i>
+            15% desde último mês
+          </p> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Cupons -->
+    <div class="col-xl-3 col-md-6">
+      <div class="stats-card">
+        <div class="card-icon bg-warning">
+          <i class="bi bi-tag"></i>
+        </div>
+        <div class="card-content">
+          <p class="card-label">Cupons Ativos</p>
+          <h3 class="card-value">{{ stats.totalCupons }}</h3>
+          <!-- <p class="card-trend negative">
+            <i class="bi bi-arrow-down"></i>
+            5% desde último mês
+          </p> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

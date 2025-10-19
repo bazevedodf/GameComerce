@@ -152,5 +152,18 @@ namespace GameCommerce.Aplicacao
                 throw new Exception($"Erro ao buscar marketing tags por identificador: {ex.Message}");
             }
         }
+
+        //Metodos Quantitativos
+        public async Task<int> GetCountAsync(int? siteInfoId = null, bool apenasAtivos = true)
+        {
+            try
+            {
+                return await _marketingTagPersist.GetCountAsync(siteInfoId, apenasAtivos);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao contar marketing tags: {ex.Message}");
+            }
+        }
     }
 }

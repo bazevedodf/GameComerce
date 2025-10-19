@@ -1,0 +1,142 @@
+.quick-actions-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+}
+
+.actions-list {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-secondary);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    
+    .action-arrow {
+      transform: translateX(2px);
+    }
+  }
+  
+  // Variantes de cor
+  &.btn-primary:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(99, 102, 241, 0.05);
+  }
+  
+  &.btn-secondary:hover {
+    border-color: #10b981;
+    background-color: rgba(16, 185, 129, 0.05);
+  }
+  
+  &.btn-success:hover {
+    border-color: #22c55e;
+    background-color: rgba(34, 197, 94, 0.05);
+  }
+  
+  &.btn-info:hover {
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.05);
+  }
+}
+
+.action-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+  
+  i {
+    font-size: 1.125rem;
+    color: white;
+  }
+  
+  .btn-primary & { background-color: var(--primary-color); }
+  .btn-secondary & { background-color: #10b981; }
+  .btn-success & { background-color: #22c55e; }
+  .btn-info & { background-color: #3b82f6; }
+}
+
+.action-content {
+  flex: 1;
+  text-align: left;
+}
+
+.action-title {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.action-description {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+.action-arrow {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  transition: transform 0.2s ease;
+  margin-left: 8px;
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .card-header {
+    padding: 16px 20px;
+  }
+  
+  .actions-list {
+    padding: 12px;
+    gap: 8px;
+  }
+  
+  .action-btn {
+    padding: 12px;
+  }
+  
+  .action-icon {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+    
+    i {
+      font-size: 1rem;
+    }
+  }
+}

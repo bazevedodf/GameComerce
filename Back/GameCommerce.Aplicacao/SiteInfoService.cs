@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GameCommerce.Aplicacao.Dtos;
+using GameCommerce.Aplicacao.Helpers;
 using GameCommerce.Aplicacao.Interfaces;
 using GameCommerce.Dominio;
 using GameCommerce.Persistencia.Interfaces;
@@ -9,11 +10,13 @@ namespace GameCommerce.Aplicacao
     public class SiteInfoService : ISiteInfoService
     {
         private readonly ISiteInfoPersist _siteInfoPersist;
+        private readonly IPedidoService _pedidoService;
         private readonly IMapper _mapper;
 
-        public SiteInfoService(ISiteInfoPersist siteInfoPersist, IMapper mapper)
+        public SiteInfoService(ISiteInfoPersist siteInfoPersist, IPedidoService pedidoService, IMapper mapper)
         {
             _siteInfoPersist = siteInfoPersist;
+            _pedidoService = pedidoService;
             _mapper = mapper;
         }
 
@@ -100,6 +103,21 @@ namespace GameCommerce.Aplicacao
             }
         }
 
+        public async Task<SiteInfoDto[]> GetByTermAsync(string termo, bool apenasAtivos = true)
+        {
+            try
+            {
+                var sites = await _siteInfoPersist.GetByTermAsync(termo, apenasAtivos);
+                if (sites == null) return null;
+
+                return _mapper.Map<SiteInfoDto[]>(sites);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao buscar sites: {ex.Message}");
+            }
+        }
+
         public async Task<SiteInfoDto> GetByDominioAsync(string dominio, bool apenasAtivos = true)
         {
             try
@@ -129,5 +147,82 @@ namespace GameCommerce.Aplicacao
                 throw new Exception(ex.Message);
             }
         }
+
+
+        //Metodos Qantitativos
+        public async Task<int> GetCountAsync(bool apenasAtivos = true)
+        {
+            try
+            {
+                return await _siteInfoPersist.GetCountAsync(apenasAtivos);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao contar sites: {ex.Message}");
+            }
+        }
+
+        public async Task<PagedResponse<SiteConsolidadoDto>> GetAllConsolidadoAsync(int page = 1, int pageSize = 10, string? search = null, bool apenasAtivos = true)
+        {
+            try
+            {
+                // Buscar dados paginados do banco
+                var siteInfos = await _siteInfoPersist.GetAllConsolidadoAsync(page, pageSize, search, apenasAtivos);
+                var totalItems = await _siteInfoPersist.GetTotalCountAsync(apenasAtivos);
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                if (siteInfos == null || !siteInfos.Any())
+                    return new PagedResponse<SiteConsolidadoDto>
+                    {
+                        Data = new List<SiteConsolidadoDto>(),
+                        Pagination = new PaginationInfo
+                        {
+                            CurrentPage = page,
+                            TotalPages = totalPages,
+                            TotalItems = totalItems,
+                            PageSize = pageSize
+                        }
+                    };
+
+                var lista = new List<SiteConsolidadoDto>();
+                foreach (var siteInfo in siteInfos)
+                {
+                    var pedidos = await _pedidoService.GetAllBySiteInfoIdAsync(siteInfo.Id, true);
+
+                    var siteCons = new SiteConsolidadoDto()
+                    {
+                        Id = siteInfo.Id,
+                        Nome = siteInfo.Nome,
+                        Dominio = siteInfo.Dominio,
+                        Status = siteInfo.Ativo,
+                        TotalProdutos = siteInfo.Produtos?.Count() ?? 0,
+                        TotalCupons = siteInfo.Cupons?.Count() ?? 0,
+                        TotalPedidos = pedidos?.Count() ?? 0,
+                        TotalPagos = pedidos?.Where(x =>
+                            x.TransacaoPagamento?.Status?.ToLower() == "paid"
+                        ).Count() ?? 0
+                    };
+                    lista.Add(siteCons);
+                }
+
+                return new PagedResponse<SiteConsolidadoDto>
+                {
+                    Data = lista,
+                    Pagination = new PaginationInfo
+                    {
+                        CurrentPage = page,
+                        TotalPages = totalPages,
+                        TotalItems = totalItems,
+                        PageSize = pageSize
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
     }
 }

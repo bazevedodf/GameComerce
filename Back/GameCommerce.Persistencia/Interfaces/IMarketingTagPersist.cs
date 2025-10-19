@@ -9,5 +9,8 @@ namespace GameCommerce.Persistencia.Interfaces
         Task<MarketingTag[]> GetBySiteInfoIdAsync(int siteInfoId, bool apenasAtivos = true);
         Task<MarketingTag[]> GetByTipoAsync(string tipo, int siteInfoId, bool apenasAtivos = true);
         Task<MarketingTag[]> GetByIdentificadorAsync(string identificador, int siteInfoId, bool apenasAtivos = true);
+
+        //Metodos Qauntitativos
+        Task<int> GetCountAsync(int? siteInfoId = null, bool apenasAtivos = true);
     }
 }

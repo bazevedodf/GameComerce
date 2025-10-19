@@ -1,0 +1,228 @@
+<div class="site-detalhe-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="bi bi-globe me-3"></i>
+        {{ isEditMode ? 'Editar Site' : 'Novo Site' }}
+      </h1>
+      <p class="page-subtitle">
+        {{ isEditMode ? 'Atualize os dados do site' : 'Cadastre um novo site na plataforma' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Formulário -->
+  <div class="content-section">
+    <div class="site-form-card">
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          
+          <!-- SEÇÃO 1: Dados do Site -->
+          <div class="form-section mb-3">
+            <div class="section-header mb-3">
+              <h3 class="section-title">
+                <i class="bi bi-info-circle me-2 text-primary"></i>
+                Dados do Site
+              </h3>
+              <p class="section-subtitle">Informações básicas do site</p>
+            </div>
+
+            <div class="row g-3">
+              <!-- Logo (placeholder para futuro upload) -->
+              <div class="col-md-3" *ngIf="isEditMode">
+                <label class="form-label">Logo do Site</label>
+                <div class="logo-upload-placeholder">
+                  <img *ngIf="site?.logoUrl" [src]="site?.logoUrl" alt="Logo" class="logo-image">
+                  <div *ngIf="!site?.logoUrl" class="logo-preview">
+                    <i class="bi bi-image display-4"></i>
+                    <small class="mt-2">Logo aparecerá aqui</small>
+                  </div>
+                  <button type="button" class="btn btn-outline-primary btn-sm mt-2 w-100" disabled>
+                    <i class="bi bi-upload me-1"></i>
+                    Upload
+                  </button>
+                </div>
+              </div>
+
+              <!-- Campos de Dados -->
+              <div [class]="isEditMode ? 'col-md-9' : 'col-12'">
+                <div class="row g-3">
+                  <!-- Nome -->
+                  <div class="col-12">
+                    <div class="d-flex align-items-baseline">
+                      <label class="form-label">Nome do Site *</label>
+                      <div class="form-check form-switch mt-2 ms-auto">
+                        <input class="form-check-input" type="checkbox" formControlName="ativo" id="ativo">
+                        <label class="form-check-label" for="ativo">
+                          Site Ativo
+                        </label>
+                      </div>
+                    </div>
+                    <input type="text" 
+                      class="form-control" 
+                      formControlName="nome"
+                      placeholder="Nome da sua loja"
+                      [ngClass]="validaCSS(f.nome)">
+                    <div *ngIf="submitted && f.nome?.invalid" class="invalid-feedback">
+                      <div *ngIf="f.nome?.errors?.required">Nome é obrigatório</div>
+                      <div *ngIf="f.nome?.errors?.['minlength']">Nome deve ter pelo menos 2 caracteres</div>
+                      <div *ngIf="f.nome?.errors?.['maxlength']">Nome deve ter no máximo 100 caracteres</div>
+                    </div>
+                    
+                  </div>
+
+                  <!-- Domínio -->
+                  <div class="col-md-6">
+                    <label class="form-label">Domínio *</label>
+                    <input type="text" class="form-control" 
+                          formControlName="dominio" 
+                          placeholder="exemplo.com.br"
+                          [ngClass]="validaCSS(f.dominio)">
+                    <div *ngIf="f.dominio.errors?.required && f.dominio.touched" class="invalid-feedback">
+                      <div *ngIf="f.dominio?.errors?.required">Domínio é obrigatório</div>
+                      <div *ngIf="f.dominio?.errors?.['pattern']">Domínio deve estar em um formato válido</div>
+                    </div>
+                  </div>
+
+                  <!-- Email -->
+                  <div class="col-md-6">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-control" formControlName="email" 
+                          placeholder="contato@exemplo.com"
+                          [ngClass]="validaCSS(f.email)">
+                    <div *ngIf="submitted && f.email?.invalid" class="invalid-feedback">
+                      <div *ngIf="f.email?.errors?.required">Email é obrigatório</div>
+                      <div *ngIf="f.email?.errors?.['email']">Email deve ser válido</div>
+                    </div>
+                    <div *ngIf="f.email.errors?.email && f.email.touched" class="invalid-feedback text-start">E-mail inválido</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEÇÃO 2: Redes Sociais -->
+          <div class="form-section mb-3">
+            <div class="section-header mb-3">
+              <h3 class="section-title">
+                <i class="bi bi-share me-2 text-primary"></i>
+                Redes Sociais
+              </h3>
+              <p class="section-subtitle">Contatos e redes sociais da loja</p>
+            </div>
+
+            <div class="row g-3">
+              <!-- WhatsApp -->
+              <div class="col-md-4">
+                <label class="form-label"><i class="bi bi-whatsapp text-success me-2"></i>WhatsApp *</label>
+                <input type="text" class="form-control" formControlName="whatsapp" 
+                  placeholder="(11) 99999-9999"
+                  [ngClass]="validaCSS(f.whatsapp)">
+                <div *ngIf="submitted && f.whatsapp?.invalid" class="invalid-feedback d-block">
+                  <div *ngIf="f.whatsapp?.errors?.required">WhatsApp é obrigatório</div>
+                </div>
+              </div>
+
+              <!-- Instagram -->
+              <div class="col-md-4">
+                <label class="form-label"><i class="bi bi-instagram text-danger me-2"></i>Instagram</label>
+                <input type="text" class="form-control" formControlName="instagram" placeholder="@usuario">
+              </div>
+
+              <!-- Facebook -->
+              <div class="col-md-4">
+                <label class="form-label"><i class="bi bi-facebook text-primary me-2"></i>Facebook</label>
+                <input type="text" class="form-control" formControlName="facebook" placeholder="facebook.com/usuario">
+              </div>
+            </div>
+          </div>
+
+          <!-- SEÇÃO 3: Empresa -->
+          <div class="form-section mb-3">
+            <div class="section-header mb-3">
+              <h3 class="section-title">
+                <i class="bi bi-building me-2 text-primary"></i>
+                Dados da Empresa
+              </h3>
+              <p class="section-subtitle">Informações legais da empresa</p>
+            </div>
+
+            <div class="row g-3">
+              <!-- CNPJ -->
+              <div class="col-md-6">
+                <label class="form-label">CNPJ *</label>
+                <input type="text" class="form-control" formControlName="cnpj" 
+                      placeholder="00.000.000/0000-00"
+                      [ngClass]="validaCSS(f.cnpj)">
+                <div *ngIf="submitted && f.cnpj?.invalid" class="invalid-feedback">
+                  <div *ngIf="f.cnpj?.errors?.required">CNPJ é obrigatório</div>
+                  <div *ngIf="f.cnpj?.errors?.['pattern']">CNPJ deve estar no formato 00.000.000/0000-00</div>
+                </div>
+              </div>
+
+              <!-- Endereço -->
+              <div class="col-md-6">
+                <label class="form-label">Endereço *</label>
+                <input type="text" class="form-control" formControlName="address" 
+                      placeholder="Rua, número, bairro, cidade - Estado"
+                      [ngClass]="validaCSS(f.address)">
+                <div *ngIf="submitted && f.address?.invalid" class="invalid-feedback">
+                  <div *ngIf="f.address?.errors?.required">Endereço é obrigatório</div>
+                  <div *ngIf="f.address?.errors?.['minlength']">Endereço deve ter pelo menos 5 caracteres</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEÇÃO 4: Configurações Técnicas -->
+          <div class="form-section mb-3">
+            <div class="section-header mb-3">
+              <h3 class="section-title">
+                <i class="bi bi-gear me-2 text-primary"></i>
+                Configurações Técnicas
+              </h3>
+              <p class="section-subtitle">Configurações avançadas da API</p>
+            </div>
+
+            <div class="row g-3">
+
+              <!-- Base URL -->
+              <div class="col-md-6">
+                <label class="form-label">Base URL</label>
+                <input type="text" class="form-control" formControlName="baseUrl" 
+                      placeholder="https://api.exemplo.com">
+                <small class="form-text">URL base para chamadas da API</small>
+              </div>
+
+              <!-- API Key -->
+              <div class="col-md-6">
+                <label class="form-label">API Key</label>
+                <input type="text" class="form-control" formControlName="apiKey" 
+                      placeholder="Chave da API">
+                <small class="form-text">Chave para integração com a API</small>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="row mt-3">
+            <div class="col-12">
+              <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-secondary" (click)="onCancel()">
+                  <i class="bi bi-x-circle me-2"></i>
+                  Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary" [disabled]="loading">
+                  <i class="bi bi-check-circle me-2"></i>
+                  {{ isEditMode ? 'Atualizar' : 'Cadastrar' }} Site
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

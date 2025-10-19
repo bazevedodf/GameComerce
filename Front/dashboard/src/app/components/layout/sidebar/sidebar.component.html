@@ -1,0 +1,77 @@
+<div class="sidebar" [class.collapsed]="isCollapsed">
+  <!-- Logo -->
+  <div class="sidebar-header">
+    <i class="bi bi-bar-chart-line-fill me-1"></i>
+    <span class="logo-text">TadalaData</span>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="sidebar-nav">
+    <a routerLink="/dashboard" class="nav-item" 
+       [class.active]="currentRoute === '/dashboard'" 
+       (click)="setActiveItem($event)">
+      <i class="bi bi-house"></i>
+      <span class="nav-text">Dashboard</span>
+    </a>
+
+    <a routerLink="/sites" class="nav-item" 
+       [class.active]="currentRoute === '/sites'" 
+       (click)="setActiveItem($event)">
+      <i class="bi bi-globe"></i>
+      <span class="nav-text">Sites</span>
+    </a>
+
+    <a routerLink="/pedidos" class="nav-item" 
+       [class.active]="currentRoute === '/pedidos'" 
+       (click)="setActiveItem($event)">
+      <i class="bi bi-cart"></i>
+      <span class="nav-text">Pedidos</span>
+    </a>
+    
+    <a routerLink="/products" class="nav-item" 
+       [class.active]="currentRoute === '/products'" 
+       (click)="setActiveItem($event)">
+      <i class="bi bi-bag"></i>
+      <span class="nav-text">Produtos</span>
+    </a>
+    
+    <a routerLink="/categories" class="nav-item" 
+       [class.active]="currentRoute === '/categories'" 
+       (click)="setActiveItem($event)">
+      <i class="bi bi-tags"></i>
+      <span class="nav-text">Categorias</span>
+    </a>
+    
+    <a routerLink="/coupons" class="nav-item" 
+       [class.active]="currentRoute === '/coupons'" 
+       (click)="setActiveItem($event)">
+      <i class="bi bi-tag"></i>
+      <span class="nav-text">Cupons</span>
+    </a>
+    
+    <a routerLink="/clients" class="nav-item" 
+       [class.active]="currentRoute === '/clients'" 
+       (click)="setActiveItem($event)">
+      <i class="bi bi-people"></i>
+      <span class="nav-text">Clientes</span>
+    </a>
+    
+    <a routerLink="/settings" class="nav-item" 
+       [class.active]="currentRoute === '/settings'" 
+       (click)="setActiveItem($event)">
+      <i class="bi bi-gear"></i>
+      <span class="nav-text">Configurações</span>
+    </a>
+  </nav>
+
+  <!-- User Profile -->
+  <div class="sidebar-footer">
+    <div class="user-profile">
+      <img class="user-avatar" src="assets/images/user-profile.png" alt="Profile">
+      <div class="user-info">
+        <p class="user-name">Admin</p>
+        <p class="user-email">admin@dashvista.com</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -9,5 +9,8 @@ namespace GameCommerce.Persistencia.Interfaces
         Task<Cupom> GetByCodigoAsync(string codigo);
         Task<Cupom[]> GetAllAsync(bool apenasAtivos = true);
         Task<Cupom> ValidarCupomAsync(string codigo);
+
+        //Metodos Quantitativos
+        Task<int> GetCountAsync(int? siteInfoId = null, bool apenasAtivos = true);
     }
 }

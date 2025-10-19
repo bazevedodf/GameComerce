@@ -1,0 +1,115 @@
+<div class="login-page">
+  <!-- Background com malha tecnológica -->
+  <div class="background-effects">
+    <div class="gradient-bg"></div>
+    <div class="mesh-pulse"></div>
+    <div class="mesh-container">
+      <!-- Nós da malha -->
+      <div class="mesh-node node-1"></div>
+      <div class="mesh-node node-2"></div>
+      <div class="mesh-node node-3"></div>
+      <div class="mesh-node node-4"></div>
+      <div class="mesh-node node-5"></div>
+      <div class="mesh-node node-6"></div>
+      <div class="mesh-node node-7"></div>
+      <div class="mesh-node node-8"></div>
+
+      <!-- Conexões diretas entre nós -->
+      <div class="connection-line line-1-2"></div>
+      <div class="connection-line line-1-7"></div>
+      <div class="connection-line line-2-5"></div>
+      <div class="connection-line line-2-7"></div>
+      <div class="connection-line line-3-6"></div>
+      <div class="connection-line line-3-8"></div>
+      <div class="connection-line line-4-6"></div>
+      <div class="connection-line line-4-8"></div>
+      <div class="connection-line line-5-7"></div>
+      <div class="connection-line line-6-8"></div>
+      <div class="connection-line line-7-8"></div>
+    </div>
+  </div>
+
+  <!-- Card de Login -->
+  <div class="login-container">
+    <div class="login-card">
+      <!-- Header do Card -->
+      <div class="card-header">
+        <div class="logo">
+          <i class="bi bi-bar-chart-line-fill"></i>
+          <span class="logo-text">TadalaData</span>
+        </div>
+        <h1 class="welcome-text">Bem-vindo de volta</h1>
+        <p class="subtitle">Entre na sua conta para continuar</p>
+      </div>
+
+      <!-- Formulário -->
+      <form class="login-form" (ngSubmit)="onLogin()">
+        <div class="form-group">
+          <!-- <label for="email" class="form-label">E-mail</label> -->
+          <input
+            type="email"
+            id="email"
+            class="form-input"
+            placeholder="seu@email.com"
+            [(ngModel)]="credentials.email"
+            name="email"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">Senha</label>
+          <div class="password-input-container">
+            <input
+              type="{{ isPasswordVisible ? 'text' : 'password' }}"
+              id="password"
+              class="form-input password-input"
+              placeholder="••••••••"
+              [(ngModel)]="credentials.password"
+              name="password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="togglePasswordVisibility()"
+            >
+              <i
+                class="bi"
+                [class.bi-eye]="!isPasswordVisible"
+                [class.bi-eye-slash]="isPasswordVisible"
+              ></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="credentials.remember"
+              (change)="onRememberChange($event)"
+              name="remember"
+            />
+            <span class="checkmark"></span>
+            Lembrar de mim
+          </label>
+          <a href="#" class="forgot-password">Esqueceu a senha?</a>
+        </div>
+
+        <button type="submit" class="login-btn" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Entrar</span>
+          <div *ngIf="isLoading" class="loading-spinner"></div>
+        </button>
+      </form>
+
+      <!-- Footer do Card -->
+      <div class="card-footer">
+        <p class="footer-text">
+          Não tem uma conta?
+          <a href="#" class="signup-link">Cadastre-se</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
