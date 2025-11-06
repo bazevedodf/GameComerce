@@ -8,12 +8,14 @@ import { PrivacyPolicyComponent } from './pages/privacy-policy/privacy-policy.co
 import { TermsOfUseComponent } from './pages/terms-of-use/terms-of-use.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { FaqComponent } from './pages/faq/faq.component';
+import { CheckoutComponent } from './pages/checkout/checkout.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
   { path: 'produtos', component: ProductListComponent },
   { path: 'produto/:id', component: ProductDetailComponent },
   { path: 'carrinho', component: ShoppingCartComponent },
+  { path: 'checkout', component: CheckoutComponent },
   { path: 'categoria/:slug', component: ProductListComponent },
   { path: 'politica-de-privacidade', component: PrivacyPolicyComponent },
   { path: 'termos-de-uso', component: TermsOfUseComponent },

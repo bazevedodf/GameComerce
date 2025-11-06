@@ -150,12 +150,20 @@ namespace GameCommerce.Api.Controllers.V1
         //}
 
         [HttpPost("webhook/pix")]
-        public async Task<ActionResult> ProcessarWebhookPix(string webhookData)
+        public async Task<ActionResult> ProcessarWebhookPix([FromBody] NewAgePostBack postback)
         {
             try
             {
+                if (postback == null)
+                    return BadRequest("Dados do webhook inválidos");
+
                 // Webhook não valida domínio (vem do gateway)
-                //await _pedidoService.ProcessarWebhookPixAsync(webhookData);
+                if (postback.Status == "paid")
+                {
+                    var sucesso = await _pedidoService.ProcessarPagamentoConfirmadoAsync(postback.Id);
+                    return sucesso ? Ok() : BadRequest("Erro ao processar webhook");
+                }
+
                 return Ok();
             }
             catch (Exception ex)

@@ -32,7 +32,7 @@
       font-weight: 600;
       transition: all 0.3s ease;
       font-size: 0.9rem;
-      
+
       &:hover {
         color: #ffc107 !important;
         padding-left: 5px;
@@ -53,13 +53,13 @@
       color: #6c757d;
       text-decoration: none;
       transition: all 0.3s ease;
-      
+
       &:hover {
         background-color: #ffc107;
         color: #000000;
         transform: translateY(-2px);
       }
-      
+
       .bi {
         font-size: 1.2rem;
       }
@@ -71,7 +71,7 @@
       font-size: 1.5rem;
       color: #b1a6a6;
       transition: color 0.3s ease;
-      
+
       &:hover {
         color: #ffc107;
       }
@@ -87,10 +87,9 @@
 
   .footer__bottom {
     border-top: 1px solid rgba(255, 255, 255, .1);
-    padding-top: 2rem;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
     text-align: center;
   }
 
@@ -99,7 +98,6 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 2rem;
-    margin-bottom: 2rem;
 
     .footer__security {
       flex: 1;
@@ -151,11 +149,11 @@
 @media (max-width: 768px) {
   .footer {
     text-align: center;
-    
+
     .social-links {
       justify-content: center;
     }
-    
+
     .payment-methods {
       margin-top: 1rem;
     }
@@ -171,10 +169,6 @@
   .footer {
     .row {
       text-align: center;
-    }
-    
-    .footer-title {
-      margin-top: 1.5rem;
     }
   }
 }

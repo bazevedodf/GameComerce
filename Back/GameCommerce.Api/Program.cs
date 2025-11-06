@@ -1,4 +1,6 @@
 using GameCommerce.Aplicacao;
+using GameCommerce.Aplicacao.Dtos;
+using GameCommerce.Aplicacao.Interface;
 using GameCommerce.Aplicacao.Interfaces;
 using GameCommerce.Aplicacao.Services;
 using GameCommerce.Persistencia;
@@ -79,6 +81,19 @@ static void ConfigureServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<ISiteInfoService, SiteInfoService>();
     builder.Services.AddScoped<IMarketingTagService, MarketingTagService>();
     builder.Services.AddScoped<IDashboardService, DashboardService>();
+
+    builder.Services.AddScoped<IQrCodeService, QrCodeService>();
+    builder.Services.AddScoped<ICodigoGameService, CodigoGameService>();
+
+    // Configurar SmtpConfig
+    var smtp = new SmtpConfig();
+    builder.Configuration.GetSection("Smtp").Bind(smtp);
+    builder.Services.AddSingleton(smtp);
+
+    // Registrar EmailService
+    builder.Services.AddScoped<IEmailService, EmailService>();
+
+
 
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(options =>

@@ -117,7 +117,7 @@ namespace GameCommerce.Persistencia
                              .ThenInclude(x => x.Produto);
 
             return await query
-                .OrderBy(s => s.DataCriacao) // Importante para paginação consistente
+                .OrderByDescending(s => s.DataCriacao) // Importante para paginação consistente
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .AsNoTracking()

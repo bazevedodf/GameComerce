@@ -15,12 +15,18 @@ namespace GameCommerce.Persistencia.Mapeamentos
             builder.HasKey(x => x.Id);
 
             // Propriedades
+            builder.Property(x => x.Nome)
+                   .HasMaxLength(100);
+
             builder.Property(x => x.Email)
                    .IsRequired()
                    .HasMaxLength(255);
 
             builder.Property(x => x.Telefone)
                    .HasMaxLength(20);
+
+            builder.Property(x => x.CPF)
+                    .HasMaxLength(14);
 
             builder.Property(x => x.Total)
                    .IsRequired()

@@ -12,50 +12,6 @@ export class CupomService {
 
   private apiUrl = `${environment.apiUrl}Loja/cupons`;
 
-  // MOCK TEMPORÁRIO - REMOVER QUANDO API FICAR PRONTA
-  private cuponsMock: Cupom[] = [
-    {
-      id: 1,
-      codigo: 'PRIMEIRACOMPRA',
-      valido: true,
-      valorDesconto: 60,
-      tipoDesconto: 'percentual',
-      mensagemErro: ''
-    },
-    {
-      id: 2,
-      codigo: 'FRETEGRATIS',
-      valido: true,
-      valorDesconto: 15,
-      tipoDesconto: 'valor_fixo',
-      mensagemErro: ''
-    },
-    {
-      id: 3,
-      codigo: 'VBUCKS10',
-      valido: true,
-      valorDesconto: 5,
-      tipoDesconto: 'percentual',
-      mensagemErro: ''
-    },
-    {
-      id: 4,
-      codigo: 'EXPIRADO',
-      valido: false,
-      valorDesconto: 0,
-      tipoDesconto: 'percentual',
-      mensagemErro: 'Este cupom expirou'
-    },
-    {
-      id: 5,
-      codigo: 'INVALIDO',
-      valido: false,
-      valorDesconto: 0,
-      tipoDesconto: 'percentual',
-      mensagemErro: 'Cupom inválido'
-    }
-  ];
-
   constructor(private http: HttpClient) { }
 
   validarCupom(codigo: string): Observable<Cupom> {

@@ -4,26 +4,26 @@
    (mouseleave)="onMouseLeave($event)"
    (mousemove)="onMouseMove($event)"
    style="transform: perspective(1000px) rotateX(0deg) rotateY(0deg); transition: transform 0.5s;">
-  
+
   <!-- Imagem do Produto com Reflection Effect -->
   <div class="product-card__image position-relative overflow-hidden">
-    <img [src]="produto.imagem" 
+    <img [src]="produto.imagem"
          [alt]="produto.nome"
          class="card-img-top"
          loading="lazy">
-    <div class="reflection position-absolute top-0 start-0 w-100 h-100" 
+    <div class="reflection position-absolute top-0 start-0 w-100 h-100"
          [style.transform]="reflectionTransform"></div>
-    
+
     <!-- Botões no Overlay (DENTRO da imagem) -->
     <div class="add-to-cart-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center"
         [class.d-none]="!showAddToCart"
         [class.d-flex]="showAddToCart">
-      
+
       <!-- Botão Comprar Agora -->
       <button class="btn btn-success fw-bold px-4 py-2 mb-2 buy-now-btn"
-              [routerLink]="['/produto', produto.id]"
-              title="Comprar Agora">
-        Detalhes
+        (click)="comprarAgora($event)"
+        title="Comprar Agora">
+        Comprar Agora
       </button>
 
       <!-- Botão Adicionar ao Carrinho -->
@@ -34,18 +34,18 @@
         Adicionar
       </button>
     </div>
-         
+
   </div>
 
   <!-- Informações do Produto -->
   <div class="product-card__info card-body d-flex flex-column p-3">
-    
+
     <!-- Título com Ícone e Verificação -->
     <div class="product-card__title-wrapper mb-1">
       <span class="product-card__title d-flex align-items-center gap-2 text-light fw-bold">
-        <img *ngIf="produto.categoria.icon" 
-          [src]="produto.categoria.icon" 
-          [alt]="produto.categoria.name" 
+        <img *ngIf="produto.categoria.icon"
+          [src]="produto.categoria.icon"
+          [alt]="produto.categoria.name"
           class="platform-icon">
         {{ formatProductName(produto.nome) }}
         <i class="bi bi-patch-check-fill text-primary fs-6 verify-icon"></i>
@@ -66,7 +66,7 @@
       <div class="product-card__current-price text-light fw-bold">
         R$ {{ produto.preco.toFixed(2) }}
       </div>
-      <div *ngIf="produto.precoOriginal > produto.preco" 
+      <div *ngIf="produto.precoOriginal > produto.preco"
            class="text-danger text-decoration-line-through small">
         R$ {{ produto.precoOriginal.toFixed(2) }}
       </div>

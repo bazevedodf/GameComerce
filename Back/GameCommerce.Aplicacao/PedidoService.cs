@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using GameCommerce.Aplicacao.Dtos;
 using GameCommerce.Aplicacao.Helpers;
+using GameCommerce.Aplicacao.Interface;
 using GameCommerce.Aplicacao.Interfaces;
 using GameCommerce.Dominio;
 using GameCommerce.Dominio.Enuns;
-using GameCommerce.Persistencia;
 using GameCommerce.Persistencia.Interfaces;
 using Microsoft.Extensions.Configuration;
+using System.Text.RegularExpressions;
+using GameCommerce.Aplicacao.Extensions;
 
 
 namespace GameCommerce.Aplicacao
@@ -17,6 +19,9 @@ namespace GameCommerce.Aplicacao
         private readonly IGatewayService _gatewayService;
         private readonly ITransacaoPagamentoPersist _transacaoPagamentoPersist;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
+        private readonly ICodigoGameService _codigoGameService;
+        private readonly IQrCodeService _qrCodeService;
         private readonly IMapper _mapper;
 
         public PedidoService(
@@ -24,12 +29,18 @@ namespace GameCommerce.Aplicacao
             IGatewayService gatewayService,
             ITransacaoPagamentoPersist transacaoPagamentoPersist,
             IConfiguration configuration,
+            IEmailService emailService,
+            ICodigoGameService codigoGameService,
+            IQrCodeService qrCodeService,
             IMapper mapper)
         {
             _pedidoPersist = pedidoPersist;
             _gatewayService = gatewayService;
             _transacaoPagamentoPersist = transacaoPagamentoPersist;
             _configuration = configuration;
+            _emailService = emailService;
+            _codigoGameService = codigoGameService;
+            _qrCodeService = qrCodeService;
             _mapper = mapper;
         }
 
@@ -246,8 +257,10 @@ namespace GameCommerce.Aplicacao
             {
                 var pedido = new Pedido
                 {
+                    Nome = pedidoDto.Nome,
                     Email = pedidoDto.Email,
                     Telefone = pedidoDto.Telefone,
+                    CPF = string.IsNullOrEmpty(pedidoDto.CPF) ? null : pedidoDto.CPF,
                     Total = pedidoDto.Total,
                     Frete = pedidoDto.Frete,
                     CupomId = pedidoDto.CupomId,
@@ -285,7 +298,8 @@ namespace GameCommerce.Aplicacao
                             PaymentMethod = "pix",
                             CustomerName = gatewayRequest.Customer?.Name,
                             CustomerEmail = pedido.Email,
-                            CustomerPhone = pedido.Telefone,
+                            CustomerPhone = gatewayRequest.Customer?.Phone,
+                            CustomerDocument = gatewayRequest.Customer?.Document_Number,
                             Status = gatewayResponse.Data.Status,
                             PixCode = gatewayResponse.Data.Pix_Code,
                             Success = gatewayResponse.Success,
@@ -300,13 +314,24 @@ namespace GameCommerce.Aplicacao
                             pedido.TransacaoId = transacao.Id;
                             await _pedidoPersist.SaveChangeAsync();
 
+                            try
+                            {
+                                var transacaoDto = _mapper.Map<TransacaoPagamentoDto>(transacao);
+                                var pedidoCompletoDto = _mapper.Map<PedidoDto>(retorno);
+                                await _emailService.EnviarEmailPagamentoPixAsync(pedidoCompletoDto, transacaoDto, pedidoDto.SiteInfo);
+                            }
+                            catch (Exception)
+                            {
+
+                            }
+
                             // RETORNAR RESPONSE DO GATEWAY PARA FRONTEND
                             return new PedidoResponseDto
                             {
                                 TransactionId = transacao.TransactionId,
-                                QrCodeImage = $"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={transacao.PixCode}",
+                                QrCodeImage = _qrCodeService.GerarQrCodeBase64(transacao.PixCode), // $"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={transacao.PixCode}",
                                 PixCode = transacao.PixCode,
-                                ExpirationTime = transacao.DataCriacao.AddMinutes(30).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                                ExpirationTime = transacao.DataCriacao.AddSeconds(120).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
                                 Status = transacao.Status
                             };
                         }
@@ -330,6 +355,46 @@ namespace GameCommerce.Aplicacao
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> ProcessarPagamentoConfirmadoAsync(string transactionId)
+        {
+            try
+            {
+                var pedido = await _pedidoPersist.GetByTransactionIdAsync(transactionId, true);
+                if (pedido == null) return false;
+
+                // Atualizar status do pedido
+                pedido.Status = "paid";
+                pedido.TransacaoPagamento.Status = "paid";
+                pedido.TransacaoPagamento.DataAtualizacao = DateTime.UtcNow;
+
+                _pedidoPersist.Update(pedido);
+                await _pedidoPersist.SaveChangeAsync();
+
+                // Gerar códigos para os itens do pedido
+                var totalItens = pedido.Itens.Sum(item => item.Quantidade);
+                var codigos = _codigoGameService.GerarCodigosGame(totalItens);
+
+                // Enviar email com códigos
+                var pedidoDto = _mapper.Map<PedidoDto>(pedido);
+                var siteInfo = await _pedidoPersist.GetByIdAsync(pedido.Id);
+
+
+                try
+                {
+                    await _emailService.EnviarEmailCodigosJogosAsync(pedidoDto, codigos, _mapper.Map<SiteInfoDto>(siteInfo));
+                }
+                catch (Exception ex)
+                {
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao processar pagamento confirmado: {ex.Message}", ex);
             }
         }
 
@@ -361,9 +426,9 @@ namespace GameCommerce.Aplicacao
                 return new PedidoResponseDto
                 {
                     TransactionId = pedido.TransacaoPagamento.TransactionId,
-                    QrCodeImage = $"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={pedido.TransacaoPagamento.PixCode}",
+                    QrCodeImage = _qrCodeService.GerarQrCodeBase64(pedido.TransacaoPagamento.PixCode),//$"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={pedido.TransacaoPagamento.PixCode}",
                     PixCode = pedido.TransacaoPagamento.PixCode,
-                    ExpirationTime = pedido.TransacaoPagamento.DataCriacao.AddMinutes(30).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                    ExpirationTime = pedido.TransacaoPagamento.DataCriacao.AddSeconds(120).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
                     Status = pedido.TransacaoPagamento.Status
                 };
             }
@@ -387,10 +452,10 @@ namespace GameCommerce.Aplicacao
                 PostbackUrl = baseUrl != "" ? $"{_util.ObterBaseUrl()}/api/v1/pedidos/webhook/pix": "",
                 Customer = new Customer
                 {
-                    Name = pedido.TransacaoPagamento?.CustomerName ?? "Cliente",
+                    Name = pedido.Nome ?? "Cliente",
                     Email = pedido.Email,
-                    Phone = _util.LimparTelefone(pedido.Telefone),
-                    Document_Number = _util.GerarCPFValido()
+                    Phone = pedido.Telefone.ApenasNumeros(),
+                    Document_Number = pedido.CPF.ApenasNumeros() ?? _util.GerarCPFValido()
                 },
                 Address = new Address
                 {

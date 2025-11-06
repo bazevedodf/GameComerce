@@ -5,8 +5,10 @@ namespace GameCommerce.Dominio
     public class Pedido
     {
         public int Id { get; set; }
+        public string Nome { get; set; }
         public string Email { get; set; }
         public string Telefone { get; set; }
+        public string? CPF { get; set; }
         public decimal Total { get; set; }
         public decimal Frete { get; set; }
         public string? Status { get; set; } // "pending", "paid", "expired"

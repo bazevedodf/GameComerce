@@ -7,6 +7,10 @@ namespace GameCommerce.Aplicacao.Dtos
     {
         public int Id { get; set; }
 
+        [Required(ErrorMessage = "Nome é obrigatório")]
+        [StringLength(100, ErrorMessage = "Nome deve ter no máximo 100 caracteres")]
+        public string Nome { get; set; }
+
         [Required(ErrorMessage = "Email é obrigatório")]
         [EmailAddress(ErrorMessage = "Email inválido")]
         [StringLength(255, ErrorMessage = "Email deve ter no máximo 255 caracteres")]
@@ -16,6 +20,9 @@ namespace GameCommerce.Aplicacao.Dtos
         [RegularExpression(@"^\(\d{2}\) \d{5}-\d{4}$", ErrorMessage = "Telefone deve estar no formato (11) 99999-9999")]
         [StringLength(20, ErrorMessage = "Telefone deve ter no máximo 20 caracteres")]
         public string Telefone { get; set; }
+
+        [RegularExpression(@"^\d{3}\.\d{3}\.\d{3}\-\d{2}$|^\d{11}$", ErrorMessage = "CPF deve estar no formato 000.000.000-00 ou 00000000000")]
+        public string? CPF { get; set; }
 
         [Required(ErrorMessage = "Total é obrigatório")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Total deve ser maior que zero")]

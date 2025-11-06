@@ -1,0 +1,476 @@
+<app-loading-spinner
+    [isLoading]="isLoading"
+    [message]="loadingMessage"
+    [subMessage]="loadingSubMessage">
+</app-loading-spinner>
+
+<app-toast-message
+    #toastMessage
+    [type]="toastType"
+    [message]="toastMessageText"
+    [seconds]="5">
+</app-toast-message>
+
+<!-- checkout.component.html -->
+<div class="shopping-cart-page">
+  <div class="container py-4">
+    <h1 class="text-white mb-4">Finalizar Pedido</h1>
+
+    <!-- Resumo Mobile (vem primeiro) -->
+    <div class="d-block d-lg-none mb-4" *ngIf="currentStep !== 3">
+      <div class="card summary-card p-3">
+        <div class="row d-flex justify-content-between sidetop mb-3">
+          <div class="col-6 cart text-white">
+            Seu Pedido
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-center justify-content-end h-100">
+              <span class="valor_total text-white me-2">R$ {{pedido.total | number:'1.2-2'}}</span>
+              <div class="qtde text-center text-white ml-2">{{getTotalQuantity()}}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="products-list mb-3">
+          <div class="product-grid" *ngFor="let item of pedido.itens">
+            <div class="d-flex align-items-center">
+              <img class="product-img" [src]="item.imagem"
+                   onerror="this.src='assets/no-image.svg'">
+            </div>
+            <div class="d-block">
+              <span class="text-subtitle">Produto {{item.produtoId}}</span>
+              <span class="info-small">Descrição do produto</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-end">
+              <span class="p-amount text-white">{{item.quantidade}} un.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cp-subtotal mb-1">
+          <div class="row justify-content-between p-0 mb-2">
+            <div class="col-6 text-left">
+              <span class="subtotal">Subtotal</span>
+            </div>
+            <div class="col-6 text-right">
+              <span class="subtotal text-white">R$ {{subtotal | number:'1.2-2'}}</span>
+            </div>
+          </div>
+
+          <div class="row justify-content-between p-0 mb-2" *ngIf="pedido.descontoAplicado && pedido.descontoAplicado > 0">
+            <div class="col-6 text-left text-success">
+              <span class="subtotal">Desconto</span><i class="bi bi-tag ms-1"></i>
+            </div>
+            <div class="col-6 text-right">
+              <span class="subtotal text-success">- R$ {{pedido.descontoAplicado | number:'1.2-2'}}</span>
+            </div>
+          </div>
+
+          <div class="row justify-content-between p-0 mb-2">
+            <div class="col-6 text-left">
+              <span class="subtotal">Frete</span>
+            </div>
+            <div class="col-6 text-right">
+              <span class="subtotal text-success" *ngIf="pedido.frete === 0">Grátis</span>
+              <span class="subtotal text-white" *ngIf="pedido.frete > 0">R$ {{pedido.frete | number:'1.2-2'}}</span>
+            </div>
+          </div>
+
+        </div>
+
+        <hr class="border-custom mt-0">
+
+        <div class="cp-total">
+          <div class="row justify-content-between total_container">
+            <div class="col-6 text-left text-white">Total</div>
+            <div class="col-6 text-right">
+              <span class="valor_total text-white">R$ {{pedido.total | number:'1.2-2'}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Coluna do Formulário -->
+      <div class="col-lg-8">
+        <!-- Steps -->
+        <div class="steps steps3 mb-4">
+          <div class="d-flex justify-content-between">
+            <!-- Etapa 1 - Identificação -->
+            <div [class]="currentStep >= 1 ? 'guide ativo current' : 'guide'">
+              <div class="guide-text">
+                <div class="d-flex flex-column flex-md-row align-items-center">
+                  <span class="step-number me-2">
+                    <span class="number">1</span>
+                    <span class="check">
+                      <svg width="12" height="9" viewBox="0 0 12 9" fill="none">
+                        <path d="M11.8639 0.656087C12.0533 0.857041 12.0439 1.17348 11.8429 1.36288L3.91309 8.83678C3.67573 9.0605 3.30311 9.05361 3.07417 8.82126L0.393838 6.10093C0.200027 5.90422 0.202372 5.58765 0.399074 5.39384C0.595777 5.20003 0.912351 5.20237 1.10616 5.39908L3.51192 7.84073L11.1571 0.635166C11.358 0.445766 11.6745 0.455133 11.8639 0.656087Z" fill="white"/>
+                      </svg>
+                    </span>
+                  </span>
+                  <div class="step-text text-white pt-1 pt-md-0 pl-0 pl-md-2">Identificação</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Etapa 2 - Entrega -->
+            <div [class]="currentStep >= 2 ? 'guide ativo current' : 'guide'">
+              <span class="guide-text">
+                <div class="d-flex flex-column flex-md-row align-items-center">
+                  <span class="step-number me-2">
+                    <span class="number">2</span>
+                    <span class="check">
+                      <svg width="12" height="9" viewBox="0 0 12 9" fill="none">
+                        <path d="M11.8639 0.656087C12.0533 0.857041 12.0439 1.17348 11.8429 1.36288L3.91309 8.83678C3.67573 9.0605 3.30311 9.05361 3.07417 8.82126L0.393838 6.10093C0.200027 5.90422 0.202372 5.58765 0.399074 5.39384C0.595777 5.20003 0.912351 5.20237 1.10616 5.39908L3.51192 7.84073L11.1571 0.635166C11.358 0.445766 11.6745 0.455133 11.8639 0.656087Z" fill="white"/>
+                      </svg>
+                    </span>
+                  </span>
+                  <span class="step-text text-white pt-1 pt-md-0 pl-0 pl-md-2">Entrega</span>
+                </div>
+              </span>
+            </div>
+
+            <!-- Etapa 3 - Pagamento -->
+            <div [class]="currentStep >= 3 ? 'guide ativo current' : 'guide'">
+              <span class="guide-text">
+                <div class="d-flex flex-column flex-md-row align-items-center">
+                  <span class="step-number me-2">
+                    <span class="number">3</span>
+                    <span class="check">
+                      <svg width="12" height="9" viewBox="0 0 12 9" fill="none">
+                        <path d="M11.8639 0.656087C12.0533 0.857041 12.0439 1.17348 11.8429 1.36288L3.91309 8.83678C3.67573 9.0605 3.30311 9.05361 3.07417 8.82126L0.393838 6.10093C0.200027 5.90422 0.202372 5.58765 0.399074 5.39384C0.595777 5.20003 0.912351 5.20237 1.10616 5.39908L3.51192 7.84073L11.1571 0.635166C11.358 0.445766 11.6745 0.455133 11.8639 0.656087Z" fill="white"/>
+                      </svg>
+                    </span>
+                  </span>
+                  <span class="step-text text-white pt-1 pt-md-0 pl-0 pl-md-2">Pagamento</span>
+                </div>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conteúdo das Etapas -->
+        <form [formGroup]="checkoutForm">
+          <!-- Etapa 1: Identificação -->
+          <div class="card p-3 p-sm-4 payment-card" *ngIf="currentStep === 1">
+            <div class="card-content-1">
+              <h2 class="text-white mb-3">Informações de Contato</h2>
+
+              <div class="row">
+                <div class="col-12 col-md-6 d-flex flex-column mb-3">
+                  <label for="name" class="text-white mb-1">Nome completo</label>
+                  <input type="text" formControlName="nome" class="form-control custom-input" placeholder="Nome e Sobrenome">
+                  <div class="invalid-feedback d-block" *ngIf="f.nome?.invalid && f.nome?.touched">
+                    Nome é obrigatório
+                  </div>
+                </div>
+                <div class="col-12 col-sm-6 d-flex flex-column mb-3">
+                  <label for="email" class="text-white mb-1">E-mail</label>
+                  <input type="email" formControlName="email" class="form-control custom-input" placeholder="email@email.com">
+                  <div class="invalid-feedback d-block" *ngIf="f.email?.invalid && f.email?.touched">
+                    <span *ngIf="f.email?.errors?.['required']">E-mail é obrigatório</span>
+                    <span *ngIf="f.email?.errors?.['email']">Digite um e-mail válido</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12 col-sm-6 d-flex flex-column mb-3">
+                  <label for="telephone" class="text-white mb-1">Telefone</label>
+                  <input type="tel"
+                    formControlName="telefone"
+                    class="form-control custom-input"
+                    placeholder="(99) 99999-9999"
+                    (input)="formatarTelefone($event)">
+                </div>
+                <!-- <div class="col-12 col-md-6 d-flex flex-column mb-3">
+                  <label for="document" class="text-white mb-1">CPF</label>
+                  <input type="text" formControlName="cpf" class="form-control custom-input" placeholder="123.456.789-12">
+                  <div class="invalid-feedback d-block" *ngIf="f.cpf?.invalid && f.cpf?.touched">
+                    CPF é obrigatório
+                  </div>
+                </div> -->
+              </div>
+
+              <div class="info-segura">
+                <div class="text-subtitle mb-3">Usamos seus dados de forma 100% segura para garantir a sua satisfação:</div>
+                <div class="row mb-2">
+                  <div class="d-flex">
+                    <img class="me-3" src="assets/checkmarkSecurity.svg">
+                    <div class="col-10 pl-md-0">
+                        <span class="info-small">Enviar o seu comprovante de compra e pagamento;</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="d-flex">
+                    <img class="me-3" src="assets/checkmarkSecurity.svg">
+                    <div class="col-10 pl-md-0">
+                        <span class="info-small">Ativado a sua garantia de devolução caso não fique satisfeito;</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="d-flex">
+                    <img class="me-3" src="assets/checkmarkSecurity.svg">
+                    <div class="col-10 pl-md-0">
+                        <span class="info-small">Acompanhe o andamento do seu pedido;</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="btn-holder mt-3 mb-3 mt-md-4">
+                <button type="button" class="btn btn-success-custom fw-bold" (click)="nextStep()" [disabled]="!isStep1Valid()">
+                  IR PARA A ENTREGA
+                </button>
+              </div>
+            </div>
+
+
+          </div>
+
+          <!-- Etapa 2: Entrega -->
+          <div class="card p-3 p-sm-4 payment-card" *ngIf="currentStep === 2">
+            <div class="card-content-2">
+              <h2 class="text-white mb-4">
+                <b>Confirmação de Dados</b>
+              </h2>
+
+              <div class="info-segura">
+                <div class="text-subtitle mb-3">Este é um produto digital e vai ser enviado por e-mail, confira os dados abaixo e siga para o passo de pagamento.</div>
+                <div class="row mb-2">
+                  <div class="d-flex">
+                    <i class="bi bi-person-circle text-success fw-bold me-3"></i>
+                    <div class="col-10 pl-md-0">
+                        <span class="info-small">{{f.nome.value}}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="d-flex">
+                    <i class="bi bi-envelope-at text-success fw-bold me-3"></i>
+                    <div class="col-10 pl-md-0">
+                        <span class="info-small">{{f.email.value}}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-2" *ngIf="f.telefone.value">
+                  <div class="d-flex">
+                    <i class="bi bi-whatsapp text-success fw-bold me-3"></i>
+                    <div class="col-10 pl-md-0">
+                        <span class="info-small">{{f.telefone.value}}</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- <div class="row mb-2">
+                  <div class="d-flex">
+                    <i class="bi bi-card-heading text-success fw-bold me-3"></i>
+                    <div class="col-10 pl-md-0">
+                        <span class="info-small">{{f.cpf.value}}</span>
+                    </div>
+                  </div>
+                </div> -->
+              </div>
+
+              <div class="btn-holder mt-3 mt-md-4">
+                <button type="button" class="btn btn-success-custom fw-bold me-2" (click)="nextStep()">
+                  IR PARA O PAGAMENTO
+                </button>
+                <button type="button" class="btn btn-secondary fw-bold ml-2" (click)="prevStep()">
+                  VOLTAR
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Etapa 3: Pagamento -->
+          <div class="card p-3 p-sm-4 mb-4 payment-card" *ngIf="currentStep === 3">
+            <div class="card-content-3">
+              <h2 class="text-white mb-4">
+                <span *ngIf="isPixPendente()">Pagamento via PIX</span>
+                <span *ngIf="isPixPago()" class="text-success">Pagamento Confirmado!</span>
+                <span *ngIf="isPixExpirado()" class="text-danger">Pagamento Expirado!</span>
+              </h2>
+
+              <!-- Modal PIX (reutilizando do shopping-cart) -->
+              <div *ngIf="isPixPendente()" class="text-center">
+                <!-- Progress Bar e Temporizador -->
+                <div class="mb-4">
+                  <div class="progress-bar-container mb-2">
+                    <div class="progress" style="height: 8px; background: #374151;">
+                      <div class="progress-bar bg-success"
+                          role="progressbar"
+                          [style.width.%]="progresso"
+                          [attr.aria-valuenow]="progresso"
+                          aria-valuemin="0"
+                          aria-valuemax="100">
+                      </div>
+                    </div>
+                    <div class="text-center mt-2">
+                      <small class="text-white fw-bold">{{ formatarTempoRestante() }}</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="text-subtitle mb-4">
+                  <p>Escaneie o QR Code</p>
+                </div>
+
+                <div class="mb-3">
+                  <img [src]="pedidoResponse?.qrCodeImage" alt="QR Code PIX" class="img-fluid pix-qrcode">
+                </div>
+
+                <div class="mb-2">
+                  <span class="info-small">Se preferir, pague com a opção PIX Copia e Cola</span>
+                </div>
+
+                <div class="mb-3">
+                  <input type="text" class="pix-code" value="{{pedidoResponse?.pixCode}}">
+                </div>
+
+                <div class="btn-holder">
+                  <button type="button" class="btn btn-success-custom fw-bold me-3" (click)="copiarCodigoPix()">
+                    Copiar Código PIX
+                  </button>
+                  <button type="button" class="btn btn-secondary fw-bold ml-2" (click)="continuarComprando()">
+                    Voltar à Loja
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="isPixPendente()" class="d-flex justify-content-center mt-4 mb-4">
+              <img src="assets/soon-pix.svg">
+              <div class="hr-vertical d-flex justify-content-center align-items-center align-self-center"></div>
+              <img src="assets/safe-environment.svg">
+            </div>
+
+            <div *ngIf="isPixPendente()" class="d-flex justify-content-center">
+
+              <div class="info-card">
+                <div class="instructions-purchase mt-0">
+                  <span><img src="assets/app-indicator.svg"></span>
+                  <p>Após copiar o código, abra seu aplicativo de pagamento onde você utiliza o Pix.</p>
+                </div>
+                <div class="instructions-purchase">
+                  <span><img src="assets/qr-code.svg"></span>
+                  <p>Escolha a opção <b>PIX Copia e Cola</b> e insira o código copiado.</p>
+                </div>
+                <div class="instructions-purchase">
+                  <span><img src="assets/check-circle-line-white.svg"></span>
+                  <p>Confirme as informações e finalize sua compra.</p>
+                </div>
+              </div>
+            </div>
+            <!-- Conteúdo - PIX PAGO -->
+            <div *ngIf="isPixPago()" class="modal-body text-center">
+              <div class="success-icon mb-4">
+                <i class="bi bi-check-circle-fill text-success display-1"></i>
+              </div>
+              <h4 class="text-success fw-bold mb-5">Pagamento Confirmado!</h4>
+              <p class="text-white mb-3">
+                Obrigado pela sua compra! Seus produtos serão enviados para:
+              </p>
+              <p class="fw-bold text-white mb-4">{{ pedido.email }}</p>
+              <p class="text-subtitle small">
+                Você receberá um email de confirmação em breve.
+              </p>
+              <div class="btn-holder mt-4">
+                <button type="button" class="btn btn-secondary fw-bold ml-2" (click)="continuarComprando()">
+                  Voltar à Loja
+                </button>
+              </div>
+            </div>
+
+            <!-- Conteúdo - PIX EXPIRADO -->
+            <div *ngIf="isPixExpirado()" class="modal-body text-center">
+              <div class="error-icon mb-4">
+                <i class="bi bi-x-circle-fill text-danger display-1"></i>
+              </div>
+              <h4 class="text-danger fw-bold mb-4">Pagamento Não Identificado</h4>
+              <p class="text-white mb-4">
+                O PIX não foi pago dentro do prazo e expirou.
+              </p>
+              <p class="text-subtitle small">
+                Se você realizou o pagamento, verifique seu e-mail ou entre em contato com nosso suporte.
+              </p>
+              <div class="btn-holder mt-4">
+                <button type="button" class="btn btn-secondary fw-bold ml-2" (click)="continuarComprando()">
+                  Voltar à Loja
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+      <!-- Coluna do Resumo (Desktop) -->
+      <div class="col-lg-4 d-none d-lg-block">
+        <div class="card summary-card p-3 sticky-top">
+          <h2 class="text-white mb-3">Seu Pedido</h2>
+
+          <div class="products-list mb-3">
+            <div class="product-grid" *ngFor="let item of pedido.itens">
+              <div class="d-flex align-items-center">
+                <img class="product-img" [src]="item.imagem"
+                     onerror="this.src='assets/no-image.svg'">
+              </div>
+              <div>
+                <span class="text-subtitle">Produto selecionado</span>
+                <span class="info-small">{{item.nome}}</span>
+              </div>
+              <div class="d-flex align-items-center justify-content-end">
+                <span class="p-amount text-white">{{item.quantidade}} un.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cp-subtotal mb-1">
+            <div class="row justify-content-between p-0 mb-2">
+              <div class="col-6 text-left">
+                <span class="subtotal">Subtotal</span>
+              </div>
+              <div class="col-6 text-right">
+                <span class="subtotal text-white">R$ {{subtotal | number:'1.2-2'}}</span>
+              </div>
+            </div>
+
+            <div class="row justify-content-between p-0 mb-2">
+              <div class="col-6 text-left">
+                <span class="subtotal">Frete</span>
+              </div>
+              <div class="col-6 text-right">
+                <span class="subtotal text-success" *ngIf="frete === 0">Grátis</span>
+                <span class="subtotal text-white" *ngIf="frete > 0">R$ {{frete | number:'1.2-2'}}</span>
+              </div>
+            </div>
+
+            <div class="row justify-content-between p-0 mb-2" *ngIf="descontoAplicado && valorDesconto > 0">
+              <div class="col-6 text-left text-success">
+                <span class="subtotal">Desconto</span><i class="bi bi-tag ms-1"></i>
+              </div>
+              <div class="col-6 text-right">
+                <span class="subtotal text-success">- R$ {{valorDesconto | number:'1.2-2'}}</span>
+              </div>
+            </div>
+          </div>
+
+          <hr class="border-custom mt-0">
+
+          <div class="cp-total">
+            <div class="row justify-content-between total_container">
+              <div class="col-6 text-left text-white">Total</div>
+              <div class="col-6 text-right">
+                <span class="valor_total text-white">R$ {{pedido.total | number:'1.2-2'}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

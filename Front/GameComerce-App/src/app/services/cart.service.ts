@@ -8,10 +8,10 @@ import { MarketingTagService } from './marketingTag.service';
   providedIn: 'root'
 })
 export class CartService {
-  
+
   private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
   public cartItems$ = this.cartItemsSubject.asObservable();
-  
+
   private isOpenSubject = new BehaviorSubject<boolean>(false);
   public isOpen$ = this.isOpenSubject.asObservable();
 
@@ -33,7 +33,7 @@ export class CartService {
   toggleSidebar(): void {
     const currentState = this.isOpenSubject.value;
     this.isOpenSubject.next(!currentState);
-    
+
     if (!currentState) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -45,14 +45,14 @@ export class CartService {
   adicionarItem(produto: Produto): void {
     const currentItems = this.cartItemsSubject.value;
     const itemExistente = currentItems.find(item => item.produto.id === produto.id);
-    
+
     let novosItens: CartItem[];
-    
+
     let quantidadeAdicionada = 1;
-  
+
     if (itemExistente) {
-      novosItens = currentItems.map(item => 
-        item.produto.id === produto.id 
+      novosItens = currentItems.map(item =>
+        item.produto.id === produto.id
           ? { ...item, quantidade: item.quantidade + 1 }
           : item
       );
@@ -61,7 +61,7 @@ export class CartService {
       novosItens = [...currentItems, { produto, quantidade: 1 }];
       quantidadeAdicionada = 1;
     }
-    
+
     this.cartItemsSubject.next(novosItens);
     this.salvarCarrinho();
 
@@ -72,7 +72,7 @@ export class CartService {
   removerItem(produtoId: number): void {
     const currentItems = this.cartItemsSubject.value;
     const novosItens = currentItems.filter(item => item.produto.id !== produtoId);
-    
+
     this.cartItemsSubject.next(novosItens);
     this.salvarCarrinho();
   }
@@ -84,19 +84,19 @@ export class CartService {
     }
 
     const currentItems = this.cartItemsSubject.value;
-    const novosItens = currentItems.map(item => 
-      item.produto.id === produtoId 
+    const novosItens = currentItems.map(item =>
+      item.produto.id === produtoId
         ? { ...item, quantidade: novaQuantidade }
         : item
     );
-    
+
     this.cartItemsSubject.next(novosItens);
     this.salvarCarrinho();
   }
 
   limparCarrinho(): void {
     this.cartItemsSubject.next([]);
-    this.salvarCarrinho();
+    localStorage.removeItem('cartItems');
   }
 
   // Cálculos

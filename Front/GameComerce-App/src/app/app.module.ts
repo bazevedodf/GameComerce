@@ -23,6 +23,7 @@ import { TermsOfUseComponent } from './pages/terms-of-use/terms-of-use.component
 import { PageHeaderComponent } from './shared/page-header/page-header.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { FaqComponent } from './pages/faq/faq.component';
+import { CheckoutComponent } from './pages/checkout/checkout.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { FaqComponent } from './pages/faq/faq.component';
     TermsOfUseComponent,
     PageHeaderComponent,
     ContactComponent,
-    FaqComponent
+    FaqComponent,
+    CheckoutComponent
   ],
   imports: [
     FormsModule,

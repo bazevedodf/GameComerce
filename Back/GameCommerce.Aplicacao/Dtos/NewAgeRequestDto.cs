@@ -20,15 +20,25 @@ namespace GameCommerce.Aplicacao.Dtos
 
     public class NewAgeResponseDto
     {
+        [JsonPropertyName("success")]
         public bool Success { get; set; }
-        public string Message { get; set; }
-        public GatewayResponseData Data { get; set; }
+
+        [JsonPropertyName("message")]
+        public string? Message { get; set; }
+
+        [JsonPropertyName("data")]
+        public GatewayResponseData? Data { get; set; }
     }
 
     public class Customer
     {
+        [JsonPropertyName("name")]
         public string Name { get; set; }
+
+        [JsonPropertyName("email")]
         public string Email { get; set; }
+
+        [JsonPropertyName("phone")]
         public string Phone { get; set; }
 
         [JsonPropertyName("document_number")]
@@ -73,17 +83,37 @@ namespace GameCommerce.Aplicacao.Dtos
 
     public class GatewayResponseData
     {
-        public bool Success { get; set; }
-        public string Message { get; set; }
-        public string Status { get; set; }
+        [JsonPropertyName("success")]
+        public bool Success { get; set; } = false;
+
+        [JsonPropertyName("message")]
+        public string? Message { get; set; }
+
+        [JsonPropertyName("status")]
+        public string? Status { get; set; }
 
         [JsonPropertyName("transaction_id")]
-        public string Transaction_Id { get; set; }
+        public string? Transaction_Id { get; set; }
 
         [JsonPropertyName("pix_code")]
-        public string Pix_Code { get; set; }
+        public string? Pix_Code { get; set; }
+
+        [JsonPropertyName("customer")]
         public Customer? Customer { get; set; }
+
         [JsonPropertyName("postback_url")]
-        public string Postback_Url { get; set; }
+        public string? Postback_Url { get; set; }
+    }
+
+    public class NewAgePostBack
+    {
+        [JsonPropertyName("id")]
+        public string? Id { get; set; }
+
+        [JsonPropertyName("status")]
+        public string? Status { get; set; }
+
+        [JsonPropertyName("customer")]
+        public Customer? Customer { get; set; }
     }
 }

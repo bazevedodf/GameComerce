@@ -1,8 +1,11 @@
 import { ItemPedido } from './ItemPedido';
 
 export interface Pedido {
-  email: string;
+  nome?: string;
+  cpf?: string;
+  email?: string;
   telefone?: string;
+  subtotal: number;
   total: number;
   frete: number;
   meioPagamento: string,
